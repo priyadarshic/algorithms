@@ -1,4 +1,4 @@
-package com.practice;
+package com.practice.trees;
 
 public class TreeNode <T> {
     private T data;

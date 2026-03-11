@@ -24,6 +24,7 @@ class BinarySearchTreeTest {
         bst.insert(80);
 
         List<Integer> expected = List.of(20, 30, 40, 50, 60, 70, 80);
+        bst.printTree();
         assertEquals(expected, bst.inOrderTraversal(), "In-order traversal should return sorted elements.");
     }
 
@@ -52,5 +53,61 @@ class BinarySearchTreeTest {
     void testEmptyTree() {
         assertTrue(bst.inOrderTraversal().isEmpty(), "In-order traversal of an empty tree should be empty.");
         assertFalse(bst.search(10), "Searching in an empty tree should return false.");
+    }
+
+    @Test
+    void testInsertDuplicateValue() {
+        bst.insert(50);
+        bst.insert(30);
+        bst.insert(50); // Duplicate
+
+        List<Integer> expected = List.of(30, 50);
+        assertEquals(expected, bst.inOrderTraversal(), "Duplicate insertions should not change the tree content in a standard BST.");
+    }
+
+    @Test
+    void testInsertRootStability() {
+        bst.insert(50);
+        TreeNode<Integer> initialRoot = bst.getRoot();
+        assertNotNull(initialRoot);
+        assertEquals(50, initialRoot.getData());
+
+        bst.insert(30);
+        bst.insert(70);
+        bst.insert(20);
+        bst.insert(40);
+
+        assertSame(initialRoot, bst.getRoot(), "The root reference should remain the same after child insertions.");
+    }
+
+    @Test
+    void testInsertSkewedTree() {
+        bst.insert(10);
+        bst.insert(20);
+        bst.insert(30);
+        bst.insert(40);
+
+        List<Integer> expected = List.of(10, 20, 30, 40);
+        assertEquals(expected, bst.inOrderTraversal(), "Skewed insertion should still produce a valid sorted sequence.");
+        
+        TreeNode<Integer> root = bst.getRoot();
+        assertNotNull(root);
+        assertNull(root.getLeft());
+        assertNotNull(root.getRight());
+        assertEquals(20, root.getRight().getData());
+    }
+
+    @Test
+    void testPrintTree() {
+        bst.insert(50);
+        bst.insert(30);
+        bst.insert(70);
+        bst.insert(20);
+        bst.insert(40);
+        bst.insert(60);
+        bst.insert(80);
+
+        System.out.println("Tree structure:");
+        bst.printTree();
     }
 }

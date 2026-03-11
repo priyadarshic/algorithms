@@ -67,4 +67,26 @@ public class BinarySearchTree<T extends Comparable<? super T>> {
     public TreeNode<T> getRoot() {
         return root;
     }
+
+    /**
+     * Prints the tree structure visually to the console.
+     */
+    public void printTree() {
+        printTreeRecursive(root, "", true);
+    }
+
+    private void printTreeRecursive(TreeNode<T> node, String prefix, boolean isTail) {
+        if (node == null) return;
+
+        System.out.println(prefix + (isTail ? "└── " : "├── ") + node.getData());
+
+        List<TreeNode<T>> children = new ArrayList<>();
+        if (node.getLeft() != null) children.add(node.getLeft());
+        if (node.getRight() != null) children.add(node.getRight());
+
+        for (int i = 0; i < children.size(); i++) {
+            boolean isLast = (i == children.size() - 1);
+            printTreeRecursive(children.get(i), prefix + (isTail ? "    " : "│   "), isLast);
+        }
+    }
 }
