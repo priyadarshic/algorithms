@@ -1,4 +1,11 @@
 package com.practice.trees;
 
-public class TreeNode {
+// Node definition used throughout all tree examples
+class TreeNode {
+    int val;
+    TreeNode left, right;
+
+    TreeNode(int val) {
+        this.val = val;
+    }
 }

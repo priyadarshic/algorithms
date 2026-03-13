@@ -8,6 +8,7 @@ public class TreeNode<T> {
     private T data;
     private TreeNode<T> left;
     private TreeNode<T> right;
+    private int height = 1;
 
     public TreeNode(T data) {
         this.data = data;
@@ -21,4 +22,7 @@ public class TreeNode<T> {
 
     public TreeNode<T> getRight() { return right; }
     public void setRight(TreeNode<T> right) { this.right = right; }
+
+    public int getHeight() { return height; }
+    public void setHeight(int height) { this.height = height; }
 }
