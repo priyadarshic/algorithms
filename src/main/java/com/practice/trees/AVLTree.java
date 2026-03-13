@@ -1,4 +1,4 @@
 package com.practice.trees;
 
-public class TreeNode {
+public class AVLTree {
 }
