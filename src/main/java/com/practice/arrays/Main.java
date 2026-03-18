@@ -1,60 +1,48 @@
 package com.practice.arrays;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 class Main {
     
     /**
-     * Merges overlapping intervals from a 2D array.
-     * 
-     * The algorithm works by:
-     * 1. Handling edge cases (null or single interval).
-     * 2. Sorting intervals by their start values to ensure we can merge in a single linear pass.
-     * 3. Building a list of merged intervals by comparing the current merged interval 
-     *    with the next interval in the sorted sequence.
-     * 
-     * @param intervals A 2D array where each element [start, end] represents an interval.
-     * @return A 2D array containing the merged intervals.
+     * Merges overlapping intervals using a while-loop structure that resembles the original logic.
+     * Fixes included: sorting, chained merge look-ahead, and correct boundary handling.
      */
     public static int[][] mergeIntervals(int[][] intervals) {
-        // Edge case: if input is null or has 1 or 0 intervals, no merging is needed.
         if (intervals == null || intervals.length <= 1) {
             return intervals;
         }
 
-        // 1. Sort intervals by start time. This is CRITICAL for the linear scan to work.
-        // If intervals [a, b] and [c, d] are sorted and a <= c, they overlap if b >= c.
+        // Must sort first for the linear scan to work correctly
         Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
 
-        List<int[]> merged = new ArrayList<>();
-        
-        // Initialize with the first interval as our starting point for merging.
-        int[] currentInterval = intervals[0];
-        merged.add(currentInterval);
+        int[][] out = new int[intervals.length][2];
+        int count = 0;
+        int i = 0;
 
-        for (int[] nextInterval : intervals) {
-            int currentEnd = currentInterval[1];
-            int nextStart = nextInterval[0];
-            int nextEnd = nextInterval[1];
+        // Using a while loop to resemble the original structure
+        while (i < intervals.length) {
+            int one = intervals[i][0];
+            int two = intervals[i][1];
 
-            // 2. Check for overlap: If the end of our current interval is greater than 
-            // or equal to the start of the next interval, they MUST overlap.
-            if (currentEnd >= nextStart) {
-                // To merge, we extend the current interval's end to the maximum end of both.
-                // We move currentInterval[1] directly because it is already in the 'merged' list.
-                currentInterval[1] = Math.max(currentEnd, nextEnd);
-            } else {
-                // 3. No overlap: This means we've finished merging into the current interval.
-                // Move on to the next interval as the new base for merging.
-                currentInterval = nextInterval;
-                merged.add(currentInterval);
+            // Look ahead and merge all subsequent intervals that overlap with 'two'
+            // This fixes the "chained merge" issue in the original logic.
+            while (i < intervals.length - 1 && two >= intervals[i + 1][0]) {
+                // If the next interval overlaps, update the end ('two') to the max end
+                two = Math.max(two, intervals[i + 1][1]);
+                i++; // Consume the merged interval
             }
+
+            // Store the final merged interval into the output array
+            out[count][0] = one;
+            out[count][1] = two;
+            count++;
+
+            i++; // Move to the next interval to process
         }
 
-        // Convert the dynamic List back to a static 2D array for the return.
-        return merged.toArray(new int[merged.size()][]);
+        // Return a copy of the array trimmed to the actual number of merged intervals
+        return Arrays.copyOf(out, count);
     }
     
     /**
