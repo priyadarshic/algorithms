@@ -1,0 +1,2533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docker & Kubernetes — Spring Boot Microservices Handbook</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sidebar-w: 0; /* No sidebar in print version */
+  --spring: #6db33f;
+  --spring-d: #4e822d;
+  --docker: #0b7ba8;
+  --k8s: #3563c5;
+  --accent: #c9501e;
+  --bg: #ffffff;
+  --surface: #f9fbfd;
+  --border: #e1e8f0;
+  --ink: #1a1f24;
+  --ink2: #3a444e;
+  --muted: #64748b;
+  --code-bg: #f8fafc;
+  --code-text: #1e293b;
+  --display: 'Outfit', sans-serif;
+  --body: 'Inter', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --docker-l: #e8f4fa;
+  --k8s-l: #eaeffc;
+  --accent-l: #fdf0eb;
+  --yellow: #e8a020;
+  --yellow-l: #fdf5e6;
+  --surface: #ffffff;
+  --code-bg: #1e1b16;
+  --code-text: #d4c9b4;
+  --mono: 'DM Mono', monospace;
+  --display: 'Fraunces', serif;
+  --body: 'DM Sans', sans-serif;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* ─── LAYOUT ─── */
+.page-wrap { max-width: 1320px; margin: 0 auto; padding: 0 2rem; }
+
+/* ─── SIDEBAR NAV ─── */
+#sidebar {
+  position: fixed;
+  left: 0; top: 0; bottom: 0;
+  width: 240px;
+  background: var(--ink);
+  padding: 2rem 0;
+  overflow-y: auto;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+}
+
+.sb-logo {
+  padding: 0 1.5rem 2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 1.5rem;
+}
+
+.sb-logo-title {
+  font-family: var(--display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.sb-logo-sub {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  margin-top: 0.3rem;
+}
+
+.sb-section {
+  padding: 0 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.sb-section-label {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.3em;
+  color: rgba(255,255,255,0.25);
+  text-transform: uppercase;
+  margin: 1.25rem 0 0.5rem;
+}
+
+.sb-link {
+  display: block;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.55);
+  text-decoration: none;
+  border-radius: 3px;
+  transition: all 0.15s;
+  margin-bottom: 0.1rem;
+  border-left: 2px solid transparent;
+}
+
+.sb-link:hover { color: #fff; background: rgba(255,255,255,0.06); }
+.sb-link.active { color: var(--spring); border-left-color: var(--spring); background: rgba(109,179,63,0.08); }
+.sb-link.docker-link.active { color: var(--docker); border-left-color: var(--docker); background: rgba(11,123,168,0.1); }
+.sb-link.k8s-link.active { color: #6a90e8; border-left-color: #6a90e8; background: rgba(53,99,197,0.1); }
+.sb-link.quiz-link.active { color: var(--accent); border-left-color: var(--accent); background: rgba(201,80,30,0.1); }
+
+/* ─── MAIN CONTENT ─── */
+#main { margin-left: 240px; }
+
+/* ─── HERO ─── */
+.hero {
+  background: var(--ink);
+  padding: 7rem 4rem 5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-pattern {
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0);
+  background-size: 28px 28px;
+}
+
+.hero-stripe {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 4px;
+  background: linear-gradient(to bottom, var(--spring), var(--docker), var(--k8s));
+}
+
+.hero-eyebrow {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  color: var(--spring);
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.hero h1 {
+  font-family: var(--display);
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-weight: 900;
+  line-height: 1.05;
+  color: #fff;
+  max-width: 700px;
+  position: relative;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--spring);
+}
+
+.hero-desc {
+  margin-top: 1.5rem;
+  color: rgba(255,255,255,0.45);
+  max-width: 580px;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  position: relative;
+}
+
+.hero-pills {
+  display: flex; gap: 0.75rem; margin-top: 2.5rem; flex-wrap: wrap;
+  position: relative;
+}
+
+.pill {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  padding: 0.4rem 1rem;
+  border-radius: 2px;
+  text-decoration: none;
+}
+
+.pill-spring { background: rgba(109,179,63,0.15); color: var(--spring); border: 1px solid rgba(109,179,63,0.3); }
+.pill-docker { background: rgba(11,123,168,0.15); color: #4ab8e8; border: 1px solid rgba(11,123,168,0.3); }
+.pill-k8s { background: rgba(53,99,197,0.15); color: #7da5f0; border: 1px solid rgba(53,99,197,0.3); }
+.pill-quiz { background: rgba(201,80,30,0.15); color: #f07248; border: 1px solid rgba(201,80,30,0.3); }
+
+.ak-item { margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; page-break-inside: avoid; }
+/* Themed Answer Key */
+.ak-item.q-spring { border-left: 4px solid var(--spring); padding-left: 1.25rem; }
+.ak-item.q-docker { border-left: 4px solid var(--docker); padding-left: 1.25rem; }
+.ak-item.q-k8s { border-left: 4px solid var(--k8s); padding-left: 1.25rem; }
+
+.ak-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 0.75rem; }
+
+/* ─── CONTENT SECTIONS ─── */
+.content-section {
+  padding: 5rem 4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.content-section:nth-child(even) { background: #faf8f5; }
+
+.section-header { margin-bottom: 3.5rem; }
+
+.section-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.25em;
+  padding: 0.35rem 0.85rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+
+.badge-spring { background: #edf7e4; color: var(--spring-d); border: 1px solid #c2e5a0; }
+.badge-docker { background: var(--docker-l); color: var(--docker); border: 1px solid #b3ddf0; }
+.badge-k8s { background: var(--k8s-l); color: var(--k8s); border: 1px solid #b8cef5; }
+.badge-deploy { background: var(--yellow-l); color: #8a5a00; border: 1px solid #f5d898; }
+.badge-quiz { background: var(--accent-l); color: var(--accent); border: 1px solid #f5c0a8; }
+
+.section-title {
+  font-family: var(--display);
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.section-title em { font-style: italic; }
+
+.section-lead {
+  margin-top: 1rem;
+  color: var(--muted);
+  max-width: 680px;
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+
+/* ─── TWO-COL ─── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 2.5rem 0; }
+.three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin: 2.5rem 0; }
+
+/* ─── CARDS ─── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.75rem;
+  position: relative;
+  transition: box-shadow 0.25s, transform 0.25s;
+}
+
+.card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.08); transform: translateY(-3px); }
+
+.card-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+}
+
+.card-dot.spring { background: var(--spring); }
+.card-dot.docker { background: var(--docker); }
+.card-dot.k8s { background: var(--k8s); }
+.card-dot.accent { background: var(--accent); }
+
+.card h3 {
+  font-family: var(--display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+  color: var(--ink);
+}
+
+.card p { font-size: 0.85rem; color: var(--muted); line-height: 1.75; }
+
+.card-tag {
+  position: absolute; top: 1.25rem; right: 1.25rem;
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+}
+
+/* ─── ARCHITECTURE BOX ─── */
+.arch-box {
+  background: var(--ink);
+  color: #fff;
+  padding: 2.5rem;
+  margin: 2.5rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.arch-box::before {
+  content: '';
+  position: absolute; top:0; left:0; right:0; bottom:0;
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+.arch-title {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.3em;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.arch-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem;
+  position: relative;
+}
+
+.arch-node {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 0.6rem 1.1rem;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  text-align: center;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.arch-node:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); }
+.arch-node.spring { border-color: rgba(109,179,63,0.5); color: #9dd66a; }
+.arch-node.docker { border-color: rgba(74,184,232,0.5); color: #4ab8e8; }
+.arch-node.k8s { border-color: rgba(125,165,240,0.5); color: #7da5f0; }
+.arch-node.db { border-color: rgba(232,160,32,0.4); color: #f0c060; }
+.arch-node.muted { border-color: rgba(255,255,255,0.08); color: rgba(255,255,255,0.35); }
+
+.arch-arrow { color: rgba(255,255,255,0.2); font-size: 1.1rem; }
+.arch-arrow-down { text-align:center; color: rgba(255,255,255,0.2); margin: 0.25rem 0; font-size:1rem; }
+
+/* ─── CODE BLOCKS ─── */
+.code-block {
+  background: var(--code-bg);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 1.5rem 0;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.code-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.65rem 1.25rem;
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.code-dots { display: flex; gap: 5px; }
+.code-dot { width: 9px; height: 9px; border-radius: 50%; }
+.dot-r { background: #ff5f56; }
+.dot-y { background: #ffbd2e; }
+.dot-g { background: #27c93f; }
+
+.code-filename {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.4);
+}
+
+.code-lang {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.15em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+}
+
+.lang-java { background: rgba(248,152,28,0.15); color: #f0952a; }
+.lang-yaml { background: rgba(109,179,63,0.15); color: var(--spring); }
+.lang-docker { background: rgba(11,123,168,0.15); color: #4ab8e8; }
+.lang-bash { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); }
+.lang-xml { background: rgba(201,80,30,0.15); color: #f07248; }
+.lang-props { background: rgba(232,160,32,0.15); color: #f0c060; }
+
+pre {
+  padding: 1.5rem 1.25rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  line-height: 1.85;
+  color: var(--code-text);
+}
+
+/* Syntax colors */
+pre .kw { color: #c792ea; }
+pre .str { color: #c3e88d; }
+pre .num { color: #f78c6c; }
+pre .cmt { color: #546e7a; font-style: italic; }
+pre .ann { color: #82aaff; }
+pre .type { color: #ffcb6b; }
+pre .fn { color: #82aaff; }
+pre .spring { color: #9dd66a; }
+pre .docker { color: #4ab8e8; }
+pre .k8s { color: #7da5f0; }
+pre .flag { color: #f0c060; }
+pre .prop { color: #f07248; }
+pre .val { color: #c3e88d; }
+
+/* ─── STEPS ─── */
+.steps-container { margin: 2.5rem 0; }
+
+.step-item {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 0 1.75rem;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.step-item:not(:last-child) .step-connector {
+  position: absolute;
+  left: 27px;
+  top: 56px;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--border), transparent);
+}
+
+.step-num {
+  width: 52px; height: 52px;
+  border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ink2);
+  background: var(--surface);
+  flex-shrink: 0;
+  position: relative; z-index: 1;
+}
+
+.step-num.spring { border-color: var(--spring); color: var(--spring); }
+.step-num.docker { border-color: var(--docker); color: var(--docker); }
+.step-num.k8s { border-color: var(--k8s); color: var(--k8s); }
+
+.step-content { padding: 0.6rem 0 2.5rem; }
+
+.step-content h3 {
+  font-family: var(--display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+}
+
+.step-content p {
+  font-size: 0.875rem;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+  line-height: 1.75;
+}
+
+/* ─── CALLOUT BOXES ─── */
+.callout {
+  padding: 1.1rem 1.5rem;
+  border-left: 3px solid;
+  margin: 1.5rem 0;
+  font-size: 0.875rem;
+}
+
+.callout-info { border-color: var(--docker); background: var(--docker-l); color: #0c5a7a; }
+.callout-warn { border-color: var(--yellow); background: var(--yellow-l); color: #6b4400; }
+.callout-tip { border-color: var(--spring); background: #edf7e4; color: #2f5a14; }
+.callout-error { border-color: var(--accent); background: var(--accent-l); color: #7a2a0a; }
+
+.callout strong { font-weight: 600; }
+
+.callout-label {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  display: block;
+  margin-bottom: 0.35rem;
+  opacity: 0.7;
+}
+
+/* ─── TABLE ─── */
+.table-wrap { overflow-x: auto; margin: 2rem 0; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.845rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+thead { background: var(--ink); }
+
+th {
+  padding: 0.85rem 1.25rem;
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.5);
+  font-weight: 400;
+}
+
+td {
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--bg); }
+
+td:first-child { font-family: var(--mono); font-size: 0.75rem; color: var(--docker); white-space: nowrap; }
+tr.k8s-row td:first-child { color: var(--k8s); }
+tr.spring-row td:first-child { color: var(--spring-d); }
+
+td .ex { color: var(--spring-d); font-family: var(--mono); font-size: 0.72rem; display: block; margin-top: 0.3rem; }
+td .desc { color: var(--muted); }
+
+/* ─── MICROSERVICES DIAGRAM ─── */
+.ms-diagram {
+  background: var(--ink);
+  padding: 2rem;
+  margin: 2rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.ms-diagram::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, rgba(109,179,63,0.08), transparent 50%),
+              radial-gradient(ellipse at 20% 80%, rgba(53,99,197,0.08), transparent 50%);
+}
+
+.ms-grid {
+  display: grid;
+  grid-template-columns: 180px 1fr 180px;
+  gap: 1.5rem;
+  align-items: center;
+  position: relative;
+}
+
+.ms-col { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.ms-node {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 0.75rem 1rem;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.ms-node:hover { background: rgba(255,255,255,0.1); }
+.ms-node.gateway { border-color: rgba(109,179,63,0.6); color: #9dd66a; }
+.ms-node.svc { border-color: rgba(74,184,232,0.4); color: #4ab8e8; }
+.ms-node.db { border-color: rgba(240,192,96,0.4); color: #f0c060; }
+.ms-node.infra { border-color: rgba(255,255,255,0.12); color: rgba(255,255,255,0.4); }
+
+.ms-center {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.ms-arrows {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.3rem;
+  color: rgba(255,255,255,0.15);
+  font-size: 1.2rem;
+}
+
+/* ─── QUIZ ─── */
+#quiz-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  max-width: 860px;
+  box-shadow: 0 2px 40px rgba(0,0,0,0.06);
+}
+
+.quiz-topbar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 1.25rem 2rem;
+  background: var(--ink);
+  gap: 1rem;
+}
+
+.quiz-topbar-left {
+  font-family: var(--display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.quiz-cat-badge {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  padding: 0.3rem 0.85rem;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+
+.cat-spring { background: rgba(109,179,63,0.2); color: #9dd66a; border: 1px solid rgba(109,179,63,0.3); }
+.cat-docker { background: rgba(74,184,232,0.2); color: #4ab8e8; border: 1px solid rgba(74,184,232,0.3); }
+.cat-k8s { background: rgba(125,165,240,0.2); color: #7da5f0; border: 1px solid rgba(125,165,240,0.3); }
+.cat-general { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.15); }
+
+.quiz-score-area {
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.4);
+}
+
+.quiz-score-area strong { color: var(--spring); font-size: 1rem; }
+
+.quiz-prog-outer {
+  height: 4px;
+  background: rgba(255,255,255,0.06);
+}
+
+.quiz-prog-inner {
+  height: 100%;
+  background: linear-gradient(90deg, var(--spring), var(--docker), var(--k8s));
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+  width: 0%;
+}
+
+.main-content { margin-left: 0; padding: 2rem; background: var(--bg); transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1); min-height: 100vh; }
+@media print {
+  #sidebar, .mobile-nav, .particles { display: none !important; }
+  #main { margin-left: 0 !important; padding: 0 !important; width: 100% !important; }
+  .content-section { page-break-before: always; border: none !important; margin: 0 !important; }
+  .code-block { page-break-inside: avoid; border: 1px solid #ddd; }
+  body { background: white !important; color: black !important; }
+}
+
+.quiz-body { padding: 2.5rem 2.5rem 1.5rem; }
+
+.q-meta {
+  display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem;
+}
+
+.q-num {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+}
+
+.q-diff {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+}
+
+.diff-easy { background: #edf7e4; color: var(--spring-d); }
+.diff-med { background: var(--yellow-l); color: #7a4a00; }
+.diff-hard { background: var(--accent-l); color: var(--accent); }
+
+.question-text {
+  font-family: var(--display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--ink);
+  margin-bottom: 0.75rem;
+  min-height: 3.5rem;
+}
+
+.q-code-hint {
+  background: var(--code-bg);
+  border-left: 3px solid var(--docker);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--code-text);
+  line-height: 1.7;
+  display: none;
+}
+
+.q-code-hint.show { display: block; }
+
+.options-grid { display: flex; flex-direction: column; gap: 0.65rem; }
+
+.opt-btn {
+  display: flex; align-items: flex-start; gap: 1rem;
+  padding: 1rem 1.25rem;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.18s;
+  line-height: 1.5;
+}
+
+.opt-btn:hover:not(:disabled) {
+  border-color: var(--docker);
+  background: var(--docker-l);
+}
+
+.opt-key {
+  min-width: 28px; height: 28px;
+  border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  flex-shrink: 0;
+  transition: all 0.18s;
+  margin-top: 1px;
+}
+
+.opt-btn:hover:not(:disabled) .opt-key {
+  border-color: var(--docker);
+  background: var(--docker);
+  color: #fff;
+}
+
+.opt-btn.correct { border-color: var(--spring); background: #edf7e4; }
+.opt-btn.correct .opt-key { background: var(--spring); border-color: var(--spring); color: #fff; }
+.opt-btn.wrong { border-color: var(--accent); background: var(--accent-l); }
+.opt-btn.wrong .opt-key { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.opt-btn:disabled { cursor: default; }
+
+/* ─── EXPLANATION PANEL ─── */
+.explanation-panel {
+  display: none;
+  margin-top: 1.5rem;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.explanation-panel.show { display: block; animation: revealPanel 0.4s ease; }
+
+@keyframes revealPanel {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.exp-header {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.85rem 1.25rem;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+}
+
+.exp-header.correct-h { background: #edf7e4; color: var(--spring-d); border-bottom: 1px solid #c2e5a0; }
+.exp-header.wrong-h { background: var(--accent-l); color: var(--accent); border-bottom: 1px solid #f5c0a8; }
+
+.exp-body { padding: 1.25rem; background: var(--surface); }
+
+.exp-body p { font-size: 0.875rem; color: var(--ink2); line-height: 1.8; margin-bottom: 0.75rem; }
+.exp-body p:last-child { margin-bottom: 0; }
+
+.exp-concept {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 1rem 1.25rem;
+  margin-top: 1rem;
+}
+
+.exp-concept-label {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+
+.exp-concept p { font-size: 0.82rem; color: var(--muted); }
+.exp-concept code { font-family: var(--mono); font-size: 0.78rem; color: var(--docker); background: var(--docker-l); padding: 0.1rem 0.35rem; }
+
+.quiz-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.25rem 2.5rem 2rem;
+}
+
+.quiz-stat { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); }
+.quiz-stat span { color: var(--ink); font-weight: 500; }
+
+.btn-next {
+  padding: 0.75rem 2rem;
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  font-family: var(--body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: none;
+  letter-spacing: 0.03em;
+}
+
+.btn-next:hover { background: var(--docker); }
+.btn-next.show { display: block; }
+
+/* ─── RESULT SCREEN ─── */
+.result-screen {
+  display: none;
+  padding: 3.5rem 2.5rem;
+  text-align: center;
+}
+
+.result-screen.show { display: block; }
+
+.result-wheel {
+  width: 160px; height: 160px;
+  position: relative;
+  margin: 0 auto 2rem;
+}
+
+.result-wheel svg { transform: rotate(-90deg); }
+
+.rw-bg { stroke: var(--border); }
+.rw-fill {
+  stroke: var(--spring);
+  stroke-linecap: butt;
+  transition: stroke-dashoffset 1.8s cubic-bezier(0.33,1,0.68,1);
+}
+
+.rw-label {
+  position: absolute; inset:0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+
+.rw-pct {
+  font-family: var(--display);
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.rw-sub {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  margin-top: 0.2rem;
+}
+
+.result-grade {
+  font-family: var(--display);
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+}
+
+.result-msg {
+  color: var(--muted);
+  max-width: 480px;
+  margin: 0 auto 1.5rem;
+  font-size: 0.9rem;
+  line-height: 1.8;
+}
+
+.result-breakdown {
+  display: flex; gap: 1.5rem; justify-content: center; margin: 2rem 0;
+  flex-wrap: wrap;
+}
+
+.rb-item {
+  text-align: center;
+  padding: 1rem 1.5rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  min-width: 100px;
+}
+
+.rb-num {
+  font-family: var(--display);
+  font-size: 1.75rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+
+.rb-label {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+}
+
+.btn-restart {
+  padding: 0.85rem 2.5rem;
+  border: 2px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-restart:hover { background: var(--ink); color: #fff; }
+
+/* ─── INLINE CODE ─── */
+code {
+  font-family: var(--mono);
+  font-size: 0.82em;
+  background: rgba(11,123,168,0.08);
+  color: var(--docker);
+  padding: 0.15em 0.4em;
+  border-radius: 2px;
+}
+
+/* ─── DIVIDER ─── */
+.divider-label {
+  display: flex; align-items: center; gap: 1rem;
+  margin: 3rem 0;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.25em;
+  color: var(--muted);
+}
+
+.divider-label::before, .divider-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* ─── CONFETTI ─── */
+.cpiece {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  animation: cfetti 3.5s ease-in forwards;
+}
+
+@keyframes cfetti {
+  0% { transform: translateY(-20px) rotate(0) scale(1); opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateY(105vh) rotate(900deg) scale(0.5); opacity: 0; }
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1024px) {
+  #sidebar { display: none; }
+  #main { margin-left: 0; }
+  .content-section { padding: 3.5rem 1.75rem; }
+  .hero { padding: 5rem 1.75rem 3.5rem; }
+  .two-col, .three-col { grid-template-columns: 1fr; }
+  .ms-grid { grid-template-columns: 1fr; }
+  .ms-arrows { display: none; }
+}
+
+/* Scrollbar */
+#sidebar::-webkit-scrollbar { width: 4px; }
+#sidebar::-webkit-scrollbar-track { background: transparent; }
+#sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ── COVER PAGE ── -->
+<div class="hero page-break" style="min-height: 100vh; display: flex; flex-direction: column; justify-content: center; text-align: center; background: white !important; color: black !important;">
+  <div class="hero-stripe" style="background: var(--spring);"></div>
+  <div class="hero-eyebrow" style="color: var(--muted);">COMPREHENSIVE FIELD HANDBOOK · 2025 EDITION</div>
+  <h1 style="font-size: 4rem; margin: 2rem 0; color: black !important;">Spring Boot<br>Microservices<br>with <em>Docker</em> &<br><em style="color:var(--k8s)">Kubernetes</em></h1>
+  <p class="hero-desc" style="color: var(--ink2); max-width: 800px; margin: 0 auto 3rem;">A production-grade walkthrough: build a real microservices system with Spring Boot, containerize every service with Docker, orchestrate with Kubernetes, and deploy end-to-end with confidence.</p>
+  
+  <div style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); display: inline-block;">
+    <div style="font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.2em; color: var(--muted); margin-bottom: 0.5rem;">AUTHOR</div>
+    <div style="font-family: var(--display); font-size: 1.5rem; font-weight: 700; color: black !important;">P.Chaudhuri</div>
+    <div style="font-family: var(--body); color: var(--muted); font-size: 1rem; margin-top: 0.5rem;">Bachelor of Technology - IT</div>
+    <div style="font-family: var(--mono); font-size: 0.9rem; color: var(--spring); font-weight: 600; margin-top: 0.3rem;">15+ years IT experience</div>
+  </div>
+</div>
+
+<!-- ── BLANK PAGE ── -->
+<div class="blank-page">
+  This page intentionally left blank.
+</div>
+
+<!-- ── TABLE OF CONTENTS ── -->
+<div class="toc-section page-break">
+  <h2 class="toc-title">Table of Contents</h2>
+  <ul class="toc-list">
+    <li class="toc-item"><a href="#microservices">CHAPTER 01: System Architecture</a> <div class="dots"></div></li>
+    <li class="toc-item"><a href="#springboot">CHAPTER 02: Spring Boot Implementation</a> <div class="dots"></div></li>
+    <li class="toc-item"><a href="#docker">CHAPTER 03: Docker Containerization</a> <div class="dots"></div></li>
+    <li class="toc-item"><a href="#kubernetes">CHAPTER 04: Kubernetes Orchestration</a> <div class="dots"></div></li>
+    <li class="toc-item"><a href="#k8s-deepdive" style="margin-left: 1.5rem; font-size: 0.9rem; opacity: 0.8;">— Critical Settings Deep Dive</a> <div class="dots"></div></li>
+    <li class="toc-item"><a href="#deployment">CHAPTER 05: End-to-End Deployment</a> <div class="dots"></div></li>
+    <li class="toc-item"><a href="#commands">CHAPTER 06: Commands Cheatsheet</a> <div class="dots"></div></li>
+    <li class="toc-item"><a href="#quiz-print">CHAPTER 07: Knowledge Assessment (Quiz)</a> <div class="dots"></div></li>
+    <li class="toc-item"><a href="#answer-key" style="color: var(--accent);">Answer Key</a> <div class="dots"></div></li>
+  </ul>
+</div>
+
+<div id="main" style="margin-left: 0; width: 100%;">
+
+<!-- Content starts here -->
+
+<!-- ════════ MICROSERVICES ARCHITECTURE ════════ -->
+<div id="microservices" class="content-section">
+  <div class="section-header">
+    <div class="section-badge badge-spring">CHAPTER 01 · ARCHITECTURE</div>
+    <h2 class="section-title">The <em>E-Commerce</em> Microservices System</h2>
+    <p class="section-lead">We'll build a realistic e-commerce platform split into 5 independent services. Each service owns its data, communicates via HTTP REST / Kafka events, and deploys independently.</p>
+  </div>
+
+  <div class="ms-diagram">
+    <div class="arch-title">SYSTEM ARCHITECTURE — E-COMMERCE PLATFORM</div>
+    <div style="position:relative; z-index:1;">
+      <!-- Row 1: client + gateway -->
+      <div class="arch-row">
+        <div class="arch-node muted">Browser / Mobile App</div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node spring">API Gateway<br><span style="font-size:0.6rem;opacity:0.6">:8080</span></div>
+      </div>
+      <div class="arch-arrow-down">↓</div>
+      <!-- Row 2: services -->
+      <div class="arch-row">
+        <div class="arch-node docker">User Service<br><span style="font-size:0.6rem;opacity:0.6">:8081</span></div>
+        <div class="arch-node docker">Product Service<br><span style="font-size:0.6rem;opacity:0.6">:8082</span></div>
+        <div class="arch-node docker">Order Service<br><span style="font-size:0.6rem;opacity:0.6">:8083</span></div>
+        <div class="arch-node docker">Notification Svc<br><span style="font-size:0.6rem;opacity:0.6">:8084</span></div>
+      </div>
+      <div class="arch-arrow-down">↓</div>
+      <!-- Row 3: infra -->
+      <div class="arch-row">
+        <div class="arch-node db">PostgreSQL<br><span style="font-size:0.6rem;opacity:0.6">users db</span></div>
+        <div class="arch-node db">PostgreSQL<br><span style="font-size:0.6rem;opacity:0.6">products db</span></div>
+        <div class="arch-node db">PostgreSQL<br><span style="font-size:0.6rem;opacity:0.6">orders db</span></div>
+        <div class="arch-node db">Apache Kafka<br><span style="font-size:0.6rem;opacity:0.6">events</span></div>
+      </div>
+      <div class="arch-arrow-down">↓</div>
+      <!-- Row 4: shared infra -->
+      <div class="arch-row">
+        <div class="arch-node k8s">Eureka Discovery</div>
+        <div class="arch-node k8s">Spring Config Server</div>
+        <div class="arch-node k8s">Redis Cache</div>
+        <div class="arch-node muted">Prometheus + Grafana</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="three-col">
+    <div class="card">
+      <div class="card-dot spring"></div>
+      <div class="card-tag">GATEWAY</div>
+      <h3>API Gateway</h3>
+      <p>Single entry point. Handles routing, auth token validation, rate limiting, and SSL termination. Uses Spring Cloud Gateway with JWT filter.</p>
+    </div>
+    <div class="card">
+      <div class="card-dot docker"></div>
+      <div class="card-tag">CORE</div>
+      <h3>User Service</h3>
+      <p>Manages registration, login, and profile. Stores users in PostgreSQL. Issues JWTs. Other services call it to validate tokens.</p>
+    </div>
+    <div class="card">
+      <div class="card-dot docker"></div>
+      <div class="card-tag">CORE</div>
+      <h3>Product Service</h3>
+      <p>CRUD for products and inventory. Exposes REST APIs consumed by the Order Service. Uses Redis caching for high-read endpoints.</p>
+    </div>
+    <div class="card">
+      <div class="card-dot docker"></div>
+      <div class="card-tag">CORE</div>
+      <h3>Order Service</h3>
+      <p>Handles checkout and order lifecycle. Calls Product Service to check stock, then publishes an <code>order.created</code> Kafka event.</p>
+    </div>
+    <div class="card">
+      <div class="card-dot accent"></div>
+      <div class="card-tag">ASYNC</div>
+      <h3>Notification Service</h3>
+      <p>Consumes Kafka events. Sends confirmation emails via SMTP. Fully decoupled — Order Service doesn't know it exists.</p>
+    </div>
+    <div class="card">
+      <div class="card-dot k8s"></div>
+      <div class="card-tag">INFRA</div>
+      <h3>Config + Discovery</h3>
+      <p>Spring Cloud Config Server reads YAML from Git. Eureka Service Registry lets services find each other by name, not IP.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SPRING BOOT ════════ -->
+<div id="springboot" class="content-section">
+  <div class="section-header">
+    <div class="section-badge badge-spring">CHAPTER 02 · SPRING BOOT</div>
+    <h2 class="section-title">Building the <em>Services</em></h2>
+    <p class="section-lead">Each microservice is a standalone Spring Boot application with its own <code>pom.xml</code>, application config, and database schema. Here's the complete structure and real code for the Order Service.</p>
+  </div>
+
+  <h3 id="sb-pom" style="font-family:var(--display);font-size:1.2rem;margin-bottom:1rem;">Maven Parent POM (shared dependency versions)</h3>
+
+  <div class="code-block">
+    <div class="code-bar"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">pom.xml (parent)</span><span class="code-lang lang-xml">XML</span></div>
+    <pre><span class="kw">&lt;parent&gt;</span>
+  <span class="kw">&lt;groupId&gt;</span>org.springframework.boot<span class="kw">&lt;/groupId&gt;</span>
+  <span class="kw">&lt;artifactId&gt;</span>spring-boot-starter-parent<span class="kw">&lt;/artifactId&gt;</span>
+  <span class="kw">&lt;version&gt;</span><span class="str">3.2.4</span><span class="kw">&lt;/version&gt;</span>
+<span class="kw">&lt;/parent&gt;</span>
+
+<span class="kw">&lt;properties&gt;</span>
+  <span class="kw">&lt;java.version&gt;</span>21<span class="kw">&lt;/java.version&gt;</span>
+  <span class="kw">&lt;spring-cloud.version&gt;</span><span class="str">2023.0.1</span><span class="kw">&lt;/spring-cloud.version&gt;</span>
+<span class="kw">&lt;/properties&gt;</span>
+
+<span class="kw">&lt;dependencies&gt;</span>
+  <span class="cmt">&lt;!-- Web + REST --&gt;</span>
+  <span class="kw">&lt;dependency&gt;</span>
+    <span class="kw">&lt;artifactId&gt;</span>spring-boot-starter-web<span class="kw">&lt;/artifactId&gt;</span>
+  <span class="kw">&lt;/dependency&gt;</span>
+  <span class="cmt">&lt;!-- JPA + Hibernate --&gt;</span>
+  <span class="kw">&lt;dependency&gt;</span>
+    <span class="kw">&lt;artifactId&gt;</span>spring-boot-starter-data-jpa<span class="kw">&lt;/artifactId&gt;</span>
+  <span class="kw">&lt;/dependency&gt;</span>
+  <span class="cmt">&lt;!-- Service Discovery client --&gt;</span>
+  <span class="kw">&lt;dependency&gt;</span>
+    <span class="kw">&lt;artifactId&gt;</span>spring-cloud-starter-netflix-eureka-client<span class="kw">&lt;/artifactId&gt;</span>
+  <span class="kw">&lt;/dependency&gt;</span>
+  <span class="cmt">&lt;!-- Centralized config --&gt;</span>
+  <span class="kw">&lt;dependency&gt;</span>
+    <span class="kw">&lt;artifactId&gt;</span>spring-cloud-starter-config<span class="kw">&lt;/artifactId&gt;</span>
+  <span class="kw">&lt;/dependency&gt;</span>
+  <span class="cmt">&lt;!-- Health + metrics --&gt;</span>
+  <span class="kw">&lt;dependency&gt;</span>
+    <span class="kw">&lt;artifactId&gt;</span>spring-boot-starter-actuator<span class="kw">&lt;/artifactId&gt;</span>
+  <span class="kw">&lt;/dependency&gt;</span>
+<span class="kw">&lt;/dependencies&gt;</span></pre>
+  </div>
+
+  <h3 style="font-family:var(--display);font-size:1.2rem;margin:2rem 0 1rem;">Order Service — Domain Model</h3>
+
+  <div class="code-block">
+    <div class="code-bar"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">Order.java</span><span class="code-lang lang-java">JAVA 21</span></div>
+    <pre><span class="ann">@Entity</span>
+<span class="ann">@Table</span>(name = <span class="str">"orders"</span>)
+<span class="ann">@Data</span>                     <span class="cmt">// Lombok: generates getters, setters, toString</span>
+<span class="ann">@NoArgsConstructor</span>
+<span class="kw">public class</span> <span class="type">Order</span> {
+
+  <span class="ann">@Id</span>
+  <span class="ann">@GeneratedValue</span>(strategy = GenerationType.UUID)
+  <span class="kw">private</span> <span class="type">String</span> id;
+
+  <span class="ann">@Column</span>(nullable = <span class="kw">false</span>)
+  <span class="kw">private</span> <span class="type">String</span> userId;
+
+  <span class="ann">@OneToMany</span>(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  <span class="kw">private</span> <span class="type">List</span>&lt;<span class="type">OrderItem</span>&gt; items;
+
+  <span class="ann">@Enumerated</span>(EnumType.STRING)
+  <span class="kw">private</span> <span class="type">OrderStatus</span> status = <span class="type">OrderStatus</span>.PENDING;
+
+  <span class="kw">private</span> <span class="type">BigDecimal</span> totalAmount;
+
+  <span class="ann">@CreationTimestamp</span>
+  <span class="kw">private</span> <span class="type">LocalDateTime</span> createdAt;
+}
+
+<span class="ann">@Entity</span>
+<span class="ann">@Data</span>
+<span class="ann">@NoArgsConstructor</span>
+<span class="kw">public class</span> <span class="type">OrderItem</span> {
+  <span class="ann">@Id</span> <span class="ann">@GeneratedValue</span>(strategy = GenerationType.IDENTITY)
+  <span class="kw">private</span> <span class="type">Long</span> id;
+  <span class="kw">private</span> <span class="type">String</span>  productId;
+  <span class="kw">private</span> <span class="type">Integer</span> quantity;
+  <span class="kw">private</span> <span class="type">BigDecimal</span> unitPrice;
+}
+
+<span class="kw">public enum</span> <span class="type">OrderStatus</span> {
+  PENDING, CONFIRMED, SHIPPED, DELIVERED, CANCELLED
+}</pre>
+  </div>
+
+  <h3 style="font-family:var(--display);font-size:1.2rem;margin:2rem 0 1rem;">Order Service — REST Controller</h3>
+
+  <div class="code-block">
+    <div class="code-bar"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">OrderController.java</span><span class="code-lang lang-java">JAVA 21</span></div>
+    <pre><span class="ann">@RestController</span>
+<span class="ann">@RequestMapping</span>(<span class="str">"/api/v1/orders"</span>)
+<span class="ann">@RequiredArgsConstructor</span>
+<span class="kw">public class</span> <span class="type">OrderController</span> {
+
+  <span class="kw">private final</span> <span class="type">OrderService</span> orderService;
+
+  <span class="ann">@PostMapping</span>
+  <span class="kw">public</span> <span class="type">ResponseEntity</span>&lt;<span class="type">OrderResponse</span>&gt; <span class="fn">createOrder</span>(
+      <span class="ann">@RequestBody</span> <span class="ann">@Valid</span> <span class="type">OrderRequest</span> request,
+      <span class="ann">@RequestHeader</span>(<span class="str">"X-User-Id"</span>) <span class="type">String</span> userId) {
+
+    <span class="type">OrderResponse</span> response = orderService.<span class="fn">createOrder</span>(request, userId);
+    <span class="kw">return</span> <span class="type">ResponseEntity</span>.<span class="fn">status</span>(HttpStatus.CREATED).<span class="fn">body</span>(response);
+  }
+
+  <span class="ann">@GetMapping</span>(<span class="str">"/{id}"</span>)
+  <span class="kw">public</span> <span class="type">ResponseEntity</span>&lt;<span class="type">OrderResponse</span>&gt; <span class="fn">getOrder</span>(<span class="ann">@PathVariable</span> <span class="type">String</span> id) {
+    <span class="kw">return</span> <span class="type">ResponseEntity</span>.<span class="fn">ok</span>(orderService.<span class="fn">findById</span>(id));
+  }
+
+  <span class="ann">@GetMapping</span>(<span class="str">"/user/{userId}"</span>)
+  <span class="kw">public</span> <span class="type">ResponseEntity</span>&lt;<span class="type">List</span>&lt;<span class="type">OrderResponse</span>&gt;&gt; <span class="fn">getUserOrders</span>(
+      <span class="ann">@PathVariable</span> <span class="type">String</span> userId) {
+    <span class="kw">return</span> <span class="type">ResponseEntity</span>.<span class="fn">ok</span>(orderService.<span class="fn">findByUser</span>(userId));
+  }
+
+  <span class="ann">@PatchMapping</span>(<span class="str">"/{id}/status"</span>)
+  <span class="kw">public</span> <span class="type">ResponseEntity</span>&lt;<span class="type">OrderResponse</span>&gt; <span class="fn">updateStatus</span>(
+      <span class="ann">@PathVariable</span> <span class="type">String</span> id,
+      <span class="ann">@RequestBody</span> <span class="type">StatusUpdateRequest</span> req) {
+    <span class="kw">return</span> <span class="type">ResponseEntity</span>.<span class="fn">ok</span>(orderService.<span class="fn">updateStatus</span>(id, req.status()));
+  }
+}</pre>
+  </div>
+
+  <h3 id="sb-service" style="font-family:var(--display);font-size:1.2rem;margin:2rem 0 1rem;">Order Service — Business Logic + Kafka Event</h3>
+
+  <div class="code-block">
+    <div class="code-bar"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">OrderService.java</span><span class="code-lang lang-java">JAVA 21</span></div>
+    <pre><span class="ann">@Service</span>
+<span class="ann">@RequiredArgsConstructor</span>
+<span class="kw">public class</span> <span class="type">OrderService</span> {
+
+  <span class="kw">private final</span> <span class="type">OrderRepository</span>    orderRepo;
+  <span class="kw">private final</span> <span class="type">ProductServiceClient</span> productClient;  <span class="cmt">// Feign client</span>
+  <span class="kw">private final</span> <span class="type">KafkaTemplate</span>&lt;<span class="type">String</span>, <span class="type">OrderEvent</span>&gt; kafka;
+  <span class="kw">private final</span> <span class="type">OrderMapper</span>          mapper;
+
+  <span class="ann">@Transactional</span>
+  <span class="kw">public</span> <span class="type">OrderResponse</span> <span class="fn">createOrder</span>(<span class="type">OrderRequest</span> req, <span class="type">String</span> userId) {
+    <span class="cmt">// 1. Verify product stock via Product Service (Feign HTTP call)</span>
+    req.items().<span class="fn">forEach</span>(item -&gt; {
+      <span class="type">ProductDto</span> product = productClient.<span class="fn">getProduct</span>(item.productId());
+      <span class="kw">if</span> (product.stock() &lt; item.quantity()) {
+        <span class="kw">throw new</span> <span class="type">InsufficientStockException</span>(item.productId());
+      }
+    });
+
+    <span class="cmt">// 2. Build and persist the order</span>
+    <span class="type">Order</span> order = mapper.<span class="fn">toEntity</span>(req);
+    order.<span class="fn">setUserId</span>(userId);
+    order.<span class="fn">setStatus</span>(<span class="type">OrderStatus</span>.CONFIRMED);
+    <span class="type">Order</span> saved = orderRepo.<span class="fn">save</span>(order);
+
+    <span class="cmt">// 3. Deduct stock asynchronously via Product Service</span>
+    productClient.<span class="fn">decrementStock</span>(req.items());
+
+    <span class="cmt">// 4. Publish Kafka event → Notification Service picks this up</span>
+    kafka.<span class="fn">send</span>(<span class="str">"order.created"</span>,
+      saved.getId(),
+      <span class="kw">new</span> <span class="type">OrderEvent</span>(saved.getId(), userId, saved.getTotalAmount())
+    );
+
+    <span class="kw">return</span> mapper.<span class="fn">toResponse</span>(saved);
+  }
+}
+
+<span class="cmt">// ── Feign client (auto-discovers via Eureka) ──</span>
+<span class="ann">@FeignClient</span>(name = <span class="str">"product-service"</span>)
+<span class="kw">public interface</span> <span class="type">ProductServiceClient</span> {
+  <span class="ann">@GetMapping</span>(<span class="str">"/api/v1/products/{id}"</span>)
+  <span class="type">ProductDto</span> <span class="fn">getProduct</span>(<span class="ann">@PathVariable</span> <span class="type">String</span> id);
+
+  <span class="ann">@PostMapping</span>(<span class="str">"/api/v1/products/stock/decrement"</span>)
+  <span class="kw">void</span> <span class="fn">decrementStock</span>(<span class="ann">@RequestBody</span> <span class="type">List</span>&lt;<span class="type">OrderItemRequest</span>&gt; items);
+}</pre>
+  </div>
+
+  <h3 id="sb-config" style="font-family:var(--display);font-size:1.2rem;margin:2rem 0 1rem;">Application Properties</h3>
+
+  <div class="code-block">
+    <div class="code-bar"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">application.yml (order-service)</span><span class="code-lang lang-props">YAML</span></div>
+    <pre><span class="prop">spring</span>:
+  <span class="prop">application</span>:
+    <span class="prop">name</span>: <span class="val">order-service</span>
+
+  <span class="prop">datasource</span>:
+    <span class="prop">url</span>: <span class="val">jdbc:postgresql://${DB_HOST:localhost}:5432/ordersdb</span>
+    <span class="prop">username</span>: <span class="val">${DB_USER:postgres}</span>
+    <span class="prop">password</span>: <span class="val">${DB_PASS:secret}</span>
+
+  <span class="prop">jpa</span>:
+    <span class="prop">hibernate</span>:
+      <span class="prop">ddl-auto</span>: <span class="val">validate</span>    <span class="cmt"># use Flyway migrations in prod</span>
+    <span class="prop">show-sql</span>: <span class="val">false</span>
+
+  <span class="prop">kafka</span>:
+    <span class="prop">bootstrap-servers</span>: <span class="val">${KAFKA_BROKERS:localhost:9092}</span>
+    <span class="prop">producer</span>:
+      <span class="prop">key-serializer</span>: <span class="val">org.apache.kafka.common.serialization.StringSerializer</span>
+      <span class="prop">value-serializer</span>: <span class="val">org.springframework.kafka.support.serializer.JsonSerializer</span>
+
+<span class="prop">eureka</span>:
+  <span class="prop">client</span>:
+    <span class="prop">service-url</span>:
+      <span class="prop">defaultZone</span>: <span class="val">http://${EUREKA_HOST:localhost}:8761/eureka</span>
+
+<span class="prop">server</span>:
+  <span class="prop">port</span>: <span class="val">8083</span>
+
+<span class="prop">management</span>:
+  <span class="prop">endpoints</span>:
+    <span class="prop">web</span>:
+      <span class="prop">exposure</span>:
+        <span class="prop">include</span>: <span class="val">health,info,metrics,prometheus</span>
+  <span class="prop">endpoint</span>:
+    <span class="prop">health</span>:
+      <span class="prop">show-details</span>: <span class="val">always</span></pre>
+  </div>
+</div>
+
+<!-- ════════ DOCKER ════════ -->
+<div id="docker" class="content-section">
+  <div class="section-header">
+    <div class="section-badge badge-docker">CHAPTER 03 · DOCKER</div>
+    <h2 class="section-title">Containerizing <em>Every Service</em></h2>
+    <p class="section-lead">Each Spring Boot service gets its own optimized multi-stage Dockerfile. We'll also wire everything together with Docker Compose for local development.</p>
+  </div>
+
+  <h3 id="docker-file" style="font-family:var(--display);font-size:1.2rem;margin-bottom:1rem;">Multi-Stage Dockerfile (used by all services)</h3>
+
+  <div class="callout callout-tip">
+    <span class="callout-label">WHY MULTI-STAGE</span>
+    <strong>Stage 1</strong> uses a full JDK to build the JAR. <strong>Stage 2</strong> uses a minimal JRE to run it. The final image is ~200MB instead of ~700MB — no build tools, no source code.
+  </div>
+
+  <div class="code-block">
+    <div class="code-bar"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">Dockerfile (order-service)</span><span class="code-lang lang-docker">DOCKERFILE</span></div>
+    <pre><span class="cmt"># ═══════════════════════════════════════════════════</span>
+<span class="cmt"># STAGE 1 — Build: Maven + JDK 21</span>
+<span class="cmt"># ═══════════════════════════════════════════════════</span>
+<span class="docker">FROM</span> eclipse-temurin:<span class="str">21-jdk-alpine</span> <span class="kw">AS</span> builder
+
+<span class="docker">WORKDIR</span> /build
+
+<span class="cmt"># Copy dependency manifests first for layer caching</span>
+<span class="docker">COPY</span> pom.xml .
+<span class="docker">COPY</span> .mvn .mvn
+<span class="docker">COPY</span> mvnw .
+<span class="docker">RUN</span> chmod +x mvnw
+
+<span class="cmt"># Download deps (cached unless pom.xml changes)</span>
+<span class="docker">RUN</span> ./mvnw dependency:go-offline -B -q
+
+<span class="cmt"># Copy source and build</span>
+<span class="docker">COPY</span> src ./src
+<span class="docker">RUN</span> ./mvnw package -DskipTests -B -q
+
+<span class="cmt"># Extract layered JAR for better Docker caching</span>
+<span class="docker">RUN</span> java -Djarmode=layertools \
+    -jar target/*.jar extract \
+    --destination /build/layers
+
+<span class="cmt"># ═══════════════════════════════════════════════════</span>
+<span class="cmt"># STAGE 2 — Runtime: minimal JRE 21</span>
+<span class="cmt"># ═══════════════════════════════════════════════════</span>
+<span class="docker">FROM</span> eclipse-temurin:<span class="str">21-jre-alpine</span>
+
+<span class="cmt"># Non-root user for security</span>
+<span class="docker">RUN</span> addgroup -S appgroup &amp;&amp; adduser -S appuser -G appgroup
+<span class="docker">USER</span> appuser
+
+<span class="docker">WORKDIR</span> /app
+
+<span class="cmt"># Copy layered JAR contents (most-stable layers first)</span>
+<span class="docker">COPY</span> --from=builder /build/layers/dependencies .
+<span class="docker">COPY</span> --from=builder /build/layers/spring-boot-loader .
+<span class="docker">COPY</span> --from=builder /build/layers/snapshot-dependencies .
+<span class="docker">COPY</span> --from=builder /build/layers/application .
+
+<span class="docker">EXPOSE</span> 8083
+
+<span class="cmt"># JVM tuning for containers</span>
+<span class="docker">ENV</span> JAVA_OPTS="-XX:+UseContainerSupport \
+               -XX:MaxRAMPercentage=75.0 \
+               -XX:+UseG1GC \
+               -Djava.security.egd=file:/dev/./urandom"
+
+<span class="docker">ENTRYPOINT</span> [<span class="str">"sh"</span>, <span class="str">"-c"</span>, \
+  <span class="str">"java $JAVA_OPTS org.springframework.boot.loader.JarLauncher"</span>]</pre>
+  </div>
+
+  <div class="callout callout-info">
+    <span class="callout-label">LAYERED JARS</span>
+    Spring Boot's <strong>layertools</strong> splits the JAR into: dependencies (rarely change), spring-boot-loader (rarely change), snapshot-dependencies, and application code (changes every build). Docker rebuilds only the changed layers — cutting push/pull time dramatically.
+  </div>
+
+  <h3 id="docker-compose" style="font-family:var(--display);font-size:1.2rem;margin:2rem 0 1rem;">Docker Compose — Full Stack Local Dev</h3>
+
+  <div class="code-block">
+    <div class="code-bar"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">docker-compose.yml</span><span class="code-lang lang-yaml">YAML</span></div>
+    <pre><span class="spring">version</span>: <span class="str">'3.9'</span>
+
+<span class="spring">services</span>:
+
+  <span class="cmt"># ── Infrastructure ────────────────────────────────</span>
+
+  <span class="prop">postgres-users</span>:
+    image: postgres:<span class="str">16-alpine</span>
+    environment:
+      POSTGRES_DB: usersdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: <span class="str">${DB_PASS:-secret}</span>
+    volumes:
+      - pgdata-users:/var/lib/postgresql/data
+    healthcheck:
+      test: [<span class="str">"CMD-SHELL"</span>, <span class="str">"pg_isready -U postgres"</span>]
+      interval: 10s
+      retries: 5
+
+  <span class="prop">postgres-orders</span>:
+    image: postgres:<span class="str">16-alpine</span>
+    environment:
+      POSTGRES_DB: ordersdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: <span class="str">${DB_PASS:-secret}</span>
+    volumes:
+      - pgdata-orders:/var/lib/postgresql/data
+    healthcheck:
+      test: [<span class="str">"CMD-SHELL"</span>, <span class="str">"pg_isready -U postgres"</span>]
+      interval: 10s
+      retries: 5
+
+  <span class="prop">postgres-products</span>:
+    image: postgres:<span class="str">16-alpine</span>
+    environment:
+      POSTGRES_DB: productsdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: <span class="str">${DB_PASS:-secret}</span>
+    volumes:
+      - pgdata-products:/var/lib/postgresql/data
+
+  <span class="prop">redis</span>:
+    image: redis:<span class="str">7-alpine</span>
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - <span class="str">"6379:6379"</span>
+
+  <span class="prop">zookeeper</span>:
+    image: confluentinc/cp-zookeeper:<span class="str">7.6.0</span>
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  <span class="prop">kafka</span>:
+    image: confluentinc/cp-kafka:<span class="str">7.6.0</span>
+    depends_on: [zookeeper]
+    ports:
+      - <span class="str">"9092:9092"</span>
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: <span class="str">"true"</span>
+    healthcheck:
+      test: kafka-topics --bootstrap-server localhost:9092 --list
+      interval: 30s
+      retries: 5
+
+  <span class="cmt"># ── Spring Cloud Infrastructure ───────────────────</span>
+
+  <span class="prop">config-server</span>:
+    build:
+      context: ./config-server
+      dockerfile: Dockerfile
+    ports:
+      - <span class="str">"8888:8888"</span>
+    environment:
+      SPRING_CLOUD_CONFIG_SERVER_GIT_URI: <span class="str">https://github.com/myorg/config-repo</span>
+
+  <span class="prop">eureka-server</span>:
+    build:
+      context: ./eureka-server
+    ports:
+      - <span class="str">"8761:8761"</span>
+    depends_on:
+      - config-server
+
+  <span class="cmt"># ── Application Services ──────────────────────────</span>
+
+  <span class="prop">user-service</span>:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    ports:
+      - <span class="str">"8081:8081"</span>
+    environment:
+      DB_HOST: postgres-users
+      DB_PASS: <span class="str">${DB_PASS:-secret}</span>
+      EUREKA_HOST: eureka-server
+    depends_on:
+      postgres-users:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+
+  <span class="prop">product-service</span>:
+    build:
+      context: ./product-service
+    ports:
+      - <span class="str">"8082:8082"</span>
+    environment:
+      DB_HOST: postgres-products
+      DB_PASS: <span class="str">${DB_PASS:-secret}</span>
+      EUREKA_HOST: eureka-server
+      REDIS_HOST: redis
+    depends_on:
+      - postgres-products
+      - eureka-server
+      - redis
+
+  <span class="prop">order-service</span>:
+    build:
+      context: ./order-service
+    ports:
+      - <span class="str">"8083:8083"</span>
+    environment:
+      DB_HOST: postgres-orders
+      DB_PASS: <span class="str">${DB_PASS:-secret}</span>
+      EUREKA_HOST: eureka-server
+      KAFKA_BROKERS: kafka:9092
+    depends_on:
+      postgres-orders:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+
+  <span class="prop">notification-service</span>:
+    build:
+      context: ./notification-service
+    environment:
+      EUREKA_HOST: eureka-server
+      KAFKA_BROKERS: kafka:9092
+      SMTP_HOST: <span class="str">${SMTP_HOST}</span>
+      SMTP_USER: <span class="str">${SMTP_USER}</span>
+      SMTP_PASS: <span class="str">${SMTP_PASS}</span>
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+  <span class="prop">api-gateway</span>:
+    build:
+      context: ./api-gateway
+    ports:
+      - <span class="str">"8080:8080"</span>     <span class="cmt"># only port exposed to the outside</span>
+    environment:
+      EUREKA_HOST: eureka-server
+      JWT_SECRET: <span class="str">${JWT_SECRET}</span>
+    depends_on:
+      - eureka-server
+      - user-service
+
+<span class="spring">volumes</span>:
+  pgdata-users:
+  pgdata-orders:
+  pgdata-products:
+
+<span id="docker-net" class="spring">networks</span>:
+  default:
+    name: ecommerce-net</pre>
+  </div>
+</div>
+
+<!-- ════════ KUBERNETES ════════ -->
+<div id="kubernetes" class="content-section">
+  <div class="section-header">
+    <div class="section-badge badge-k8s">CHAPTER 04 · KUBERNETES</div>
+    <h2 class="section-title">Orchestrating with <em>Kubernetes</em></h2>
+    <p class="section-lead">We migrate from Compose to Kubernetes. Each service gets a Deployment + Service. Sensitive config lives in Secrets; environment config in ConfigMaps. Ingress handles external traffic.</p>
+  </div>
+
+  <div class="arch-box">
+    <div class="arch-title">KUBERNETES CLUSTER LAYOUT</div>
+    <div style="position:relative;z-index:1;">
+      <div class="arch-row">
+        <div class="arch-node muted">Internet Traffic</div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node k8s">Ingress Controller<br><span style="font-size:0.6rem;opacity:0.6">nginx / 80,443</span></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node spring">api-gateway Service<br><span style="font-size:0.6rem;opacity:0.6">ClusterIP :8080</span></div>
+      </div>
+      <div class="arch-arrow-down">↓</div>
+      <div class="arch-row">
+        <div class="arch-node docker">user-service<br>Deployment (2 pods)</div>
+        <div class="arch-node docker">product-service<br>Deployment (3 pods)</div>
+        <div class="arch-node docker">order-service<br>Deployment (3 pods)</div>
+        <div class="arch-node docker">notification-svc<br>Deployment (1 pod)</div>
+      </div>
+      <div class="arch-arrow-down">↓</div>
+      <div class="arch-row">
+        <div class="arch-node db">StatefulSet<br>PostgreSQL</div>
+        <div class="arch-node db">StatefulSet<br>Kafka</div>
+        <div class="arch-node k8s">Deployment<br>Redis</div>
+        <div class="arch-node k8s">Deployment<br>Eureka Server</div>
+      </div>
+      <div class="arch-arrow-down">↓</div>
+      <div class="arch-row">
+        <div class="arch-node muted">ConfigMap: app-config</div>
+        <div class="arch-node muted">Secret: db-credentials</div>
+        <div class="arch-node muted">Secret: jwt-secret</div>
+        <div class="arch-node muted">PersistentVolumeClaims</div>
+      </div>
+    </div>
+  </div>
+
+  <h3 id="k8s-config" style="font-family:var(--display);font-size:1.2rem;margin:2rem 0 1rem;">ConfigMap — Shared App Config</h3>
+
+  <div class="code-block">
+    <div class="code-bar"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">k8s/configmap.yaml</span><span class="code-lang lang-yaml">YAML</span></div>
+    <pre><span class="k8s">apiVersion</span>: v1
+<span class="k8s">kind</span>: ConfigMap
+<span class="k8s">metadata</span>:
+  name: app-config
+  namespace: ecommerce
+<span class="k8s">data</span>:
+  EUREKA_HOST: <span class="str">"eureka-server"</span>
+  KAFKA_BROKERS: <span class="str">"kafka-service:9092"</span>
+  REDIS_HOST: <span class="str">"redis-service"</span>
+  LOG_LEVEL: <span class="str">"INFO"</span>
+  JVM_OPTS: <span class="str">"-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"</span></pre>
+  </div>
+
+  <h3 style="font-family:var(--display);font-size:1.2rem;margin:2rem 0 1rem;">Secret — Sensitive Credentials</h3>
+
+  <div class="code-block">
+    <div class="code-bar"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">k8s/secrets.yaml</span><span class="code-lang lang-yaml">YAML</span></div>
+    <pre><span class="k8s">apiVersion</span>: v1
+<span class="k8s">kind</span>: Secret
+<span class="k8s">metadata</span>:
+  name: db-credentials
+  namespace: ecommerce
+<span class="k8s">type</span>: Opaque
+<span class="k8s">stringData</span>:                       <span class="cmt"># K8s encodes to base64 automatically</span>
+  DB_USER: <span class="str">"postgres"</span>
+  DB_PASS: <span class="str">"s3cur3P@ssw0rd!"</span>
+  JWT_SECRET: <span class="str">"your-256-bit-jwt-signing-secret"</span>
+  SMTP_USER: <span class="str">"noreply@example.com"</span>
+  SMTP_PASS: <span class="str">"smtp-password-here"</span>
+
+<span class="cmt"># ── TIP: In production use Sealed Secrets or ─────</span>
+<span class="cmt"># ── External Secrets Operator + AWS Secrets Manager ─</span></pre>
+  </div>
+
+  <h3 id="k8s-deployment" style="font-family:var(--display);font-size:1.2rem;margin:2rem 0 1rem;">Order Service — Deployment Manifest</h3>
+
+  <div class="code-block">
+    <div class="code-bar"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">k8s/order-service-deployment.yaml</span><span class="code-lang lang-yaml">YAML</span></div>
+    <pre><span class="k8s">apiVersion</span>: apps/v1
+<span class="k8s">kind</span>: Deployment
+<span class="k8s">metadata</span>:
+  name: order-service
+  namespace: ecommerce
+  labels:
+    app: order-service
+    version: v1.2.0
+<span class="k8s">spec</span>:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: order-service
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1           <span class="cmt"># 1 extra pod during update</span>
+      maxUnavailable: 0     <span class="cmt"># zero downtime</span>
+  template:
+    metadata:
+      labels:
+        app: order-service
+      annotations:
+        prometheus.io/scrape: <span class="str">"true"</span>
+        prometheus.io/path: /actuator/prometheus
+        prometheus.io/port: <span class="str">"8083"</span>
+    spec:
+      containers:
+      - name: order-service
+        image: myregistry/order-service:<span class="str">1.2.0</span>
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8083
+          name: http
+        envFrom:
+        - configMapRef:
+            name: app-config       <span class="cmt"># inject all ConfigMap keys as env vars</span>
+        - secretRef:
+            name: db-credentials   <span class="cmt"># inject all Secrets as env vars</span>
+        env:
+        - name: DB_HOST            <span class="cmt"># per-service override</span>
+          value: postgres-orders
+        resources:
+          requests:
+            memory: <span class="str">"256Mi"</span>
+            cpu: <span class="str">"250m"</span>
+          limits:
+            memory: <span class="str">"512Mi"</span>
+            cpu: <span class="str">"500m"</span>
+        startupProbe:              <span class="cmt"># gives Spring Boot time to start</span>
+          httpGet:
+            path: /actuator/health
+            port: 8083
+          failureThreshold: 30
+          periodSeconds: 10
+        readinessProbe:            <span class="cmt"># traffic only when ready</span>
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8083
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          failureThreshold: 3
+        livenessProbe:             <span class="cmt"># restart if unhealthy</span>
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8083
+          initialDelaySeconds: 30
+          periodSeconds: 20
+      terminationGracePeriodSeconds: 60</pre>
+  </div>
+
+  <h3 style="font-family:var(--display);font-size:1.2rem;margin:2rem 0 1rem;">Service + Ingress Manifests</h3>
+
+  <div class="code-block">
+    <div class="code-bar"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">k8s/order-service-svc.yaml + ingress.yaml</span><span class="code-lang lang-yaml">YAML</span></div>
+    <pre><span class="cmt"># ── ClusterIP Service (internal discovery) ───────</span>
+<span class="k8s">apiVersion</span>: v1
+<span class="k8s">kind</span>: Service
+<span class="k8s">metadata</span>:
+  name: order-service
+  namespace: ecommerce
+<span class="k8s">spec</span>:
+  selector:
+    app: order-service
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8083
+  type: ClusterIP
+
+---
+<span class="cmt"># ── Ingress (external traffic routing) ──────────</span>
+<span class="k8s">apiVersion</span>: networking.k8s.io/v1
+<span class="k8s">kind</span>: Ingress
+<span class="k8s">metadata</span>:
+  name: ecommerce-ingress
+  namespace: ecommerce
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+<span class="k8s">spec</span>:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - api.ecommerce.com
+    secretName: ecommerce-tls
+  rules:
+  - host: api.ecommerce.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway
+            port:
+              number: 80</pre>
+  </div>
+
+  <h3 style="font-family:var(--display);font-size:1.2rem;margin:2rem 0 1rem;">HorizontalPodAutoscaler</h3>
+
+  <div class="code-block">
+    <div class="code-bar"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">k8s/order-service-hpa.yaml</span><span class="code-lang lang-yaml">YAML</span></div>
+    <pre><span class="k8s">apiVersion</span>: autoscaling/v2
+<span class="k8s">kind</span>: HorizontalPodAutoscaler
+<span class="k8s">metadata</span>:
+  name: order-service-hpa
+  namespace: ecommerce
+<span class="k8s">spec</span>:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: order-service
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70    <span class="cmt"># scale up if CPU &gt; 70%</span>
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80</pre>
+  </div>
+
+  <h3 id="k8s-deepdive" style="font-family:var(--display);font-size:1.3rem;margin:3rem 0 1.5rem;color:var(--k8s);border-bottom:2px solid rgba(53,99,197,0.1);padding-bottom:0.5rem;">Deep Dive: Critical K8s Settings</h3>
+  
+  <p style="margin-bottom:1.5rem;">For a new learner, some keys in a YAML manifest seem like "boilerplate," but they are the difference between a self-healing cluster and a cascading failure. Here are the most important ones explained.</p>
+
+  <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:1.5rem;margin-bottom:2rem;">
+    <div class="callout" style="margin:0;">
+      <h4 id="k8s-probes" style="color:var(--k8s);margin-bottom:0.5rem;">1. Probes (The Doctor)</h4>
+      <p style="font-size:0.9rem;"><strong>Liveness:</strong> "Am I alive?" If this fails, K8s kills the pod and starts a new one (Reboot). Use this for deadlocks.<br>
+      <strong>Readiness:</strong> "Am I ready for traffic?" If this fails, K8s stops sending requests to this pod (Isolate). Use this during slow Spring Boot startup.</p>
+    </div>
+    <div class="callout" style="margin:0;">
+      <h4 id="k8s-resources" style="color:var(--k8s);margin-bottom:0.5rem;">2. Requests vs Limits</h4>
+      <p style="font-size:0.9rem;"><strong>Requests:</strong> The minimum resources (CPU/RAM) K8s <em>guarantees</em> the pod. If the node doesn't have this, the pod won't start (Pending).<br>
+      <strong>Limits:</strong> The absolute maximum. If a pod hits its RAM limit, it's <strong>OOMKilled</strong>. For CPU, it's just throttled (slowed down).</p>
+    </div>
+  </div>
+
+  <div class="callout callout-info">
+    <h4 id="k8s-graceful" style="margin-bottom:0.8rem;">Graceful Shutdown & Signal Handling</h4>
+    <p>When you delete a pod (or scale down), K8s sends a <code>SIGTERM</code> signal. By default, it waits <strong>30 seconds</strong> (<code>terminationGracePeriodSeconds</code>) before sending a <code>SIGKILL</code>.</p>
+    <ul style="font-size:0.9rem;margin-top:0.5rem;">
+      <li><strong>Spring Boot 3+:</strong> Set <code>server.shutdown: graceful</code> in <code>application.yml</code> so your app finishes active REST requests before exiting.</li>
+      <li><strong>Pre-stop Hook:</strong> Sometimes used to wait for Nginx/LoadBalancer to stop sending traffic before the app starts shutting down.</li>
+    </ul>
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:1.5rem;">
+    <h4 style="margin-bottom:0.5rem;">ImagePullPolicy: Why "Always" is risky</h4>
+    <p style="font-size:0.9rem;"><code>Always</code>: K8s pulls the image from the registry every time a pod starts. If the registry is down, your app won't start.<br>
+    <code>IfNotPresent</code>: (Best for Prod) Only pulls if the image doesn't exist on the Node. Faster startup and more resilient.</p>
+  </div>
+
+  <div class="code-block" style="margin-top:1.5rem;">
+    <div class="code-bar"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">Deployment Specs (snippet)</span><span class="code-lang lang-yaml">YAML</span></div>
+    <pre><span class="k8s">spec</span>:
+  <span class="k8s">template</span>:
+    <span class="k8s">spec</span>:
+      containers:
+      - name: order-service
+        image: myapp/order-service:1.0
+        <span class="prop">imagePullPolicy</span>: <span class="val">IfNotPresent</span>
+        <span class="prop">resources</span>:
+          <span class="prop">requests</span>:
+            <span class="prop">memory</span>: <span class="val">"512Mi"</span>
+            <span class="prop">cpu</span>: <span class="val">"250m"</span>
+          <span class="prop">limits</span>:
+            <span class="prop">memory</span>: <span class="val">"1Gi"</span>
+        <span class="prop">livenessProbe</span>:
+          <span class="prop">httpGet</span>: { <span class="prop">path</span>: <span class="val">/actuator/health/liveness</span>, <span class="prop">port</span>: <span class="val">8083</span> }
+          <span class="prop">initialDelaySeconds</span>: <span class="val">30</span>
+          <span class="prop">periodSeconds</span>: <span class="val">10</span>
+        <span class="prop">readinessProbe</span>:
+          <span class="prop">httpGet</span>: { <span class="prop">path</span>: <span class="val">/actuator/health/readiness</span>, <span class="prop">port</span>: <span class="val">8083</span> }
+      <span class="prop">terminationGracePeriodSeconds</span>: <span class="val">45</span></pre>
+  </div>
+
+  <div class="callout callout-info" style="margin-top:2.5rem;">
+    <h4 style="margin-bottom:0.8rem;">How to Verify and Debug These Settings</h4>
+    <p style="margin-bottom:1rem;">K8s won't always tell you <em>why</em> a pod is failing unless you know where to look. Use these commands to inspect the settings we just discussed:</p>
+    <ul style="font-size:0.9rem;list-style:none;padding:0;">
+      <li style="margin-bottom:1rem;padding-left:1rem;border-left:3px solid var(--spring);">
+        <strong>Check for OOMKilled or CrashLoopBackOff:</strong><br>
+        <code>kubectl get pods -n ecommerce</code> — If RESTARTS &gt; 0, your pod is likely hitting a memory limit (OOMKilled).
+      </li>
+      <li style="margin-bottom:1rem;padding-left:1rem;border-left:3px solid var(--spring);">
+        <strong>See Probe failures and Events:</strong><br>
+        <code>kubectl describe pod [pod-name] -n ecommerce</code> — Look at the <strong>Events</strong> section at the bottom. It will say "Liveness probe failed" or "Readiness probe failed".
+      </li>
+      <li style="margin-bottom:1rem;padding-left:1rem;border-left:3px solid var(--spring);">
+        <strong>Monitor Resource Usage live:</strong><br>
+        <code>kubectl top pod -n ecommerce</code> — Shows exactly how much CPU/RAM your pods are consuming vs their Requests/Limits.
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════ DEPLOYMENT ════════ -->
+<div id="deployment" class="content-section">
+  <div class="section-header">
+    <div class="section-badge badge-deploy">CHAPTER 05 · DEPLOYMENT</div>
+    <h2 class="section-title">End-to-End <em>Deployment</em> Steps</h2>
+    <p class="section-lead">Full walkthrough: build images, push to registry, spin up local K8s with minikube, apply manifests, verify health, and set up a CI/CD pipeline.</p>
+  </div>
+
+  <div id="deploy-minikube" class="divider-label">PART A — LOCAL KUBERNETES WITH MINIKUBE</div>
+
+  <div class="steps-container">
+    <div class="step-item">
+      <div class="step-connector"></div>
+      <div class="step-num docker">01</div>
+      <div class="step-content">
+        <h3>Start minikube with sufficient resources</h3>
+        <p>Our stack needs at least 4 CPUs and 8GB RAM for all services to run comfortably.</p>
+        <div class="code-block">
+          <div class="code-bar"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">terminal</span><span class="code-lang lang-bash">BASH</span></div>
+          <pre>minikube start \
+  <span class="flag">--driver=docker</span> \
+  <span class="flag">--cpus=4</span> \
+  <span class="flag">--memory=8192</span> \
+  <span class="flag">--disk-size=30g</span> \
+  <span class="flag">--kubernetes-version=v1.29.0</span>
+
+<span class="cmt"># Enable Ingress controller</span>
+minikube addons enable ingress
+minikube addons enable metrics-server
+
+<span class="cmt"># Verify cluster is healthy</span>
+kubectl get nodes
+kubectl get pods -n kube-system</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-connector"></div>
+      <div class="step-num docker">02</div>
+      <div class="step-content">
+        <h3>Build images directly into minikube's Docker daemon</h3>
+        <p>Pointing your shell's Docker CLI to minikube's daemon avoids pushing to a registry during local dev.</p>
+        <div class="code-block">
+          <div class="code-bar"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">terminal</span><span class="code-lang lang-bash">BASH</span></div>
+          <pre><span class="cmt"># Point local Docker to minikube's daemon</span>
+eval $(minikube docker-env)
+
+<span class="cmt"># Build all services (from project root)</span>
+<span class="kw">for</span> svc <span class="kw">in</span> config-server eureka-server api-gateway \
+          user-service product-service order-service \
+          notification-service; <span class="kw">do</span>
+  echo <span class="str">"→ Building $svc..."</span>
+  docker build <span class="flag">-t</span> myapp/$svc:latest ./$svc/
+<span class="kw">done</span>
+
+<span class="cmt"># Verify images are available inside minikube</span>
+docker images | grep myapp</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-connector"></div>
+      <div class="step-num k8s">03</div>
+      <div class="step-content">
+        <h3>Create namespace and apply configs/secrets</h3>
+        <p>All resources live in the <code>ecommerce</code> namespace for isolation.</p>
+        <div class="code-block">
+          <div class="code-bar"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">terminal</span><span class="code-lang lang-bash">BASH</span></div>
+          <pre><span class="cmt"># Create namespace</span>
+kubectl create namespace ecommerce
+
+<span class="cmt"># Apply ConfigMap and Secrets first</span>
+kubectl apply <span class="flag">-f</span> k8s/configmap.yaml
+kubectl apply <span class="flag">-f</span> k8s/secrets.yaml
+
+<span class="cmt"># Verify</span>
+kubectl get configmaps <span class="flag">-n</span> ecommerce
+kubectl get secrets <span class="flag">-n</span> ecommerce
+
+<span class="cmt"># Inspect a ConfigMap</span>
+kubectl describe configmap app-config <span class="flag">-n</span> ecommerce</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-connector"></div>
+      <div class="step-num k8s">04</div>
+      <div class="step-content">
+        <h3>Deploy infrastructure services first</h3>
+        <p>PostgreSQL (StatefulSet), Kafka, Redis, Eureka, and Config Server must be healthy before app services start.</p>
+        <div class="code-block">
+          <div class="code-bar"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">terminal</span><span class="code-lang lang-bash">BASH</span></div>
+          <pre><span class="cmt"># Deploy infrastructure layer</span>
+kubectl apply <span class="flag">-f</span> k8s/infra/
+
+<span class="cmt"># Wait for PostgreSQL StatefulSets to be ready</span>
+kubectl rollout status statefulset/postgres <span class="flag">-n</span> ecommerce
+kubectl rollout status statefulset/kafka    <span class="flag">-n</span> ecommerce
+
+<span class="cmt"># Watch all pods until they're Running</span>
+kubectl get pods <span class="flag">-n</span> ecommerce <span class="flag">-w</span>
+
+<span class="cmt"># Deploy Spring Cloud services</span>
+kubectl apply <span class="flag">-f</span> k8s/config-server.yaml
+kubectl rollout status deployment/config-server <span class="flag">-n</span> ecommerce
+
+kubectl apply <span class="flag">-f</span> k8s/eureka-server.yaml
+kubectl rollout status deployment/eureka-server <span class="flag">-n</span> ecommerce</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-connector"></div>
+      <div class="step-num k8s">05</div>
+      <div class="step-content">
+        <h3>Deploy application services</h3>
+        <p>Apply all service Deployments and their ClusterIP Services. The HPA manifests ensure auto-scaling is configured.</p>
+        <div class="code-block">
+          <div class="code-bar"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">terminal</span><span class="code-lang lang-bash">BASH</span></div>
+          <pre><span class="cmt"># Apply all app service manifests at once</span>
+kubectl apply <span class="flag">-f</span> k8s/services/
+
+<span class="cmt"># Apply HPA manifests</span>
+kubectl apply <span class="flag">-f</span> k8s/hpa/
+
+<span class="cmt"># Check rollout status for all deployments</span>
+kubectl rollout status deployment <span class="flag">-n</span> ecommerce
+
+<span class="cmt"># Verify all pods are running with correct replica count</span>
+kubectl get pods <span class="flag">-n</span> ecommerce <span class="flag">-o</span> wide
+
+<span class="cmt"># Example output:</span>
+<span class="cmt"># NAME                               READY   STATUS    RESTARTS</span>
+<span class="cmt"># order-service-7d8b9c-abc12         1/1     Running   0</span>
+<span class="cmt"># order-service-7d8b9c-def34         1/1     Running   0</span>
+<span class="cmt"># order-service-7d8b9c-ghi56         1/1     Running   0</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-connector"></div>
+      <div class="step-num k8s">06</div>
+      <div class="step-content">
+        <h3>Expose & test the API Gateway</h3>
+        <p>Use <code>minikube tunnel</code> to make LoadBalancer services accessible from your host machine.</p>
+        <div class="code-block">
+          <div class="code-bar"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">terminal</span><span class="code-lang lang-bash">BASH</span></div>
+          <pre><span class="cmt"># Apply Ingress</span>
+kubectl apply <span class="flag">-f</span> k8s/ingress.yaml
+
+<span class="cmt"># In a separate terminal, run minikube tunnel</span>
+minikube tunnel
+
+<span class="cmt"># Get the Ingress address</span>
+kubectl get ingress <span class="flag">-n</span> ecommerce
+
+<span class="cmt"># Test the API via the gateway</span>
+curl http://$(minikube ip)/api/v1/products
+
+<span class="cmt"># Or port-forward directly for quick debugging:</span>
+kubectl port-forward svc/api-gateway 8080:80 <span class="flag">-n</span> ecommerce
+curl http://localhost:8080/api/v1/products</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-num k8s">07</div>
+      <div class="step-content">
+        <h3>Roll out an update (zero downtime)</h3>
+        <p>Update the order-service to v1.3.0. K8s performs a rolling update — old pods stay alive until new ones pass health checks.</p>
+        <div class="code-block">
+          <div class="code-bar"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">terminal</span><span class="code-lang lang-bash">BASH</span></div>
+          <pre><span class="cmt"># Build and tag new version</span>
+docker build <span class="flag">-t</span> myapp/order-service:1.3.0 ./order-service/
+
+<span class="cmt"># Update deployment image</span>
+kubectl set image deployment/order-service \
+  order-service=myapp/order-service:1.3.0 \
+  <span class="flag">-n</span> ecommerce
+
+<span class="cmt"># Watch the rolling update live</span>
+kubectl rollout status deployment/order-service <span class="flag">-n</span> ecommerce
+
+<span class="cmt"># View rollout history</span>
+kubectl rollout history deployment/order-service <span class="flag">-n</span> ecommerce
+
+<span class="cmt"># Emergency rollback if something breaks</span>
+kubectl rollout undo deployment/order-service <span class="flag">-n</span> ecommerce</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="deploy-github" class="divider-label">PART B — CI/CD PIPELINE (GITHUB ACTIONS)</div>
+
+  <div class="code-block">
+    <div class="code-bar"><div class="code-dots"><div class="code-dot dot-r"></div><div class="code-dot dot-y"></div><div class="code-dot dot-g"></div></div><span class="code-filename">.github/workflows/deploy.yml</span><span class="code-lang lang-yaml">YAML</span></div>
+    <pre><span class="spring">name</span>: Build → Push → Deploy
+
+<span class="spring">on</span>:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+<span class="spring">env</span>:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}/ecommerce
+
+<span class="spring">jobs</span>:
+  <span class="prop">test</span>:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: <span class="str">'21'</span>
+          distribution: temurin
+          cache: maven
+      - name: Run unit tests
+        run: ./mvnw test <span class="flag">-B</span>
+      - name: Run integration tests
+        run: ./mvnw verify <span class="flag">-P</span> integration-test <span class="flag">-B</span>
+
+  <span class="prop">build-push</span>:
+    needs: test
+    if: github.ref == <span class="str">'refs/heads/main'</span>
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [user-service, product-service,
+                  order-service, notification-service,
+                  api-gateway]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push ${{ matrix.service }}
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ matrix.service }}
+          push: <span class="str">true</span>
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/${{ matrix.service }}:latest
+            ${{ env.IMAGE_PREFIX }}/${{ matrix.service }}:${{ github.sha }}
+
+  <span class="prop">deploy</span>:
+    needs: build-push
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set kubeconfig
+        run: echo <span class="str">"${{ secrets.KUBECONFIG }}"</span> | base64 -d &gt; kubeconfig.yaml
+      - name: Deploy to Kubernetes
+        env:
+          KUBECONFIG: ./kubeconfig.yaml
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          <span class="cmt"># Update image tags in manifests using kustomize</span>
+          kustomize edit set image \
+            order-service=${{ env.IMAGE_PREFIX }}/order-service:$IMAGE_TAG
+          kubectl apply <span class="flag">-k</span> k8s/overlays/production
+          kubectl rollout status deployment <span class="flag">-n</span> ecommerce <span class="flag">--timeout=10m</span></pre>
+  </div>
+
+  <div id="deploy-prod" class="callout callout-warn" style="margin-top:2rem;">
+    <span class="callout-label">PRODUCTION CHECKLIST</span>
+    <strong>Before going to production:</strong> enable Pod Disruption Budgets, configure resource quotas per namespace, use Sealed Secrets (not plain Secrets in Git), set up Prometheus + Grafana for observability, configure cluster autoscaling, and use <code>imagePullPolicy: IfNotPresent</code> with pinned image digests instead of <code>:latest</code>.
+  </div>
+</div>
+
+<!-- ════════ COMMANDS ════════ -->
+<div id="commands" class="content-section">
+  <div class="section-header">
+    <div class="section-badge badge-docker">CHAPTER 06 · REFERENCE</div>
+    <h2 class="section-title">Commands <em>Cheatsheet</em></h2>
+  </div>
+
+  <h3 id="cmd-docker" style="font-family:var(--display);font-size:1.15rem;margin-bottom:1rem;color:var(--docker);">🐳 Docker</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>COMMAND</th><th>USE CASE</th><th>EXAMPLE</th></tr></thead>
+      <tbody>
+        <tr><td>docker build</td><td class="desc">Build from Dockerfile with tag</td><td class="desc"><span class="ex">docker build -t myapp:1.0 --no-cache .</span></td></tr>
+        <tr><td>docker run</td><td class="desc">Start container with env vars</td><td class="desc"><span class="ex">docker run -d -p 8083:8083 -e DB_HOST=db myapp:1.0</span></td></tr>
+        <tr><td>docker compose up</td><td class="desc">Start all services, rebuild if changed</td><td class="desc"><span class="ex">docker compose up -d --build</span></td></tr>
+        <tr><td>docker logs</td><td class="desc">Stream logs from a container</td><td class="desc"><span class="ex">docker logs -f --tail=200 order-service</span></td></tr>
+        <tr><td>docker exec</td><td class="desc">Shell into running container</td><td class="desc"><span class="ex">docker exec -it order-service /bin/sh</span></td></tr>
+        <tr><td>docker stats</td><td class="desc">Real-time CPU/memory usage</td><td class="desc"><span class="ex">docker stats --no-stream</span></td></tr>
+        <tr><td>docker inspect</td><td class="desc">View container metadata as JSON</td><td class="desc"><span class="ex">docker inspect order-service | jq '.[0].NetworkSettings'</span></td></tr>
+        <tr><td>docker cp</td><td class="desc">Copy files to/from container</td><td class="desc"><span class="ex">docker cp order-service:/app/logs ./logs</span></td></tr>
+        <tr><td>docker image prune</td><td class="desc">Remove dangling images (free disk)</td><td class="desc"><span class="ex">docker image prune -af --filter "until=48h"</span></td></tr>
+        <tr><td>docker save / load</td><td class="desc">Export/import image as tar archive</td><td class="desc"><span class="ex">docker save myapp:1.0 | gzip > myapp.tar.gz</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 id="cmd-k8s" style="font-family:var(--display);font-size:1.15rem;margin:2.5rem 0 1rem;color:var(--k8s);">☸️ kubectl</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>COMMAND</th><th>USE CASE</th><th>EXAMPLE</th></tr></thead>
+      <tbody>
+        <tr class="k8s-row"><td>kubectl get</td><td class="desc">List resources, wide output shows Node IPs</td><td class="desc"><span class="ex">kubectl get pods -n ecommerce -o wide</span></td></tr>
+        <tr class="k8s-row"><td>kubectl describe</td><td class="desc">Detailed info + events (debug crashloops)</td><td class="desc"><span class="ex">kubectl describe pod order-service-abc -n ecommerce</span></td></tr>
+        <tr class="k8s-row"><td>kubectl logs</td><td class="desc">Logs from specific container in multi-container Pod</td><td class="desc"><span class="ex">kubectl logs -f deploy/order-service -c order-service -n ecommerce</span></td></tr>
+        <tr class="k8s-row"><td>kubectl exec</td><td class="desc">Debug inside a Pod</td><td class="desc"><span class="ex">kubectl exec -it deploy/order-service -n ecommerce -- /bin/sh</span></td></tr>
+        <tr class="k8s-row"><td>kubectl apply</td><td class="desc">Declarative create/update (idempotent)</td><td class="desc"><span class="ex">kubectl apply -f k8s/ --dry-run=client</span></td></tr>
+        <tr class="k8s-row"><td>kubectl delete</td><td class="desc">Remove resource(s)</td><td class="desc"><span class="ex">kubectl delete pod order-service-abc -n ecommerce</span></td></tr>
+        <tr class="k8s-row"><td>kubectl rollout</td><td class="desc">Manage, watch, and undo rollouts</td><td class="desc"><span class="ex">kubectl rollout undo deployment/order-service -n ecommerce</span></td></tr>
+        <tr class="k8s-row"><td>kubectl scale</td><td class="desc">Manually set replica count</td><td class="desc"><span class="ex">kubectl scale deploy/order-service --replicas=5 -n ecommerce</span></td></tr>
+        <tr class="k8s-row"><td>kubectl top</td><td class="desc">Live CPU/memory per pod</td><td class="desc"><span class="ex">kubectl top pods -n ecommerce --sort-by=memory</span></td></tr>
+        <tr class="k8s-row"><td>kubectl port-forward</td><td class="desc">Expose pod/service to localhost</td><td class="desc"><span class="ex">kubectl port-forward svc/eureka-server 8761:8761 -n ecommerce</span></td></tr>
+        <tr class="k8s-row"><td>kubectl get events</td><td class="desc">Cluster events sorted by time</td><td class="desc"><span class="ex">kubectl get events -n ecommerce --sort-by='.lastTimestamp'</span></td></tr>
+        <tr class="k8s-row"><td>kubectl config</td><td class="desc">Switch between clusters/namespaces</td><td class="desc"><span class="ex">kubectl config use-context prod-cluster</span></td></tr>
+        <tr class="k8s-row"><td>kubectl drain</td><td class="desc">Evict pods before node maintenance</td><td class="desc"><span class="ex">kubectl drain node1 --ignore-daemonsets --delete-emptydir-data</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════ QUIZ (PRINT VERSION) ════════ -->
+<div id="quiz-print" class="content-section quiz-print-section">
+  <div class="section-header">
+    <div class="section-badge badge-quiz">CHAPTER 07 · ASSESSMENT</div>
+    <h2 class="section-title">Knowledge <em>Quiz</em></h2>
+    <p class="section-lead">Test your understanding of Spring Boot, Docker, and Kubernetes. Answers and detailed explanations are provided in the Answer Key on the final page.</p>
+  </div>
+
+  <div class="q-container q-spring">
+    <div class="q-type"><span>SPRING BOOT</span> <span>EASY</span></div>
+    <div class="q-title">1. Which Spring Boot annotation marks a class as a RESTful controller that returns JSON responses directly (not a view)?</div>
+    <div class="q-options-list">
+      <div class="q-option"><span class="q-option-key">A</span> @Controller</div>
+      <div class="q-option"><span class="q-option-key">B</span> @RestController</div>
+      <div class="q-option"><span class="q-option-key">C</span> @Service</div>
+      <div class="q-option"><span class="q-option-key">D</span> @RequestMapping</div>
+    </div>
+  </div>
+
+  <div class="q-container q-spring">
+    <div class="q-type"><span>SPRING BOOT</span> <span>MEDIUM</span></div>
+    <div class="q-title">2. In this Spring Boot service, what will happen if the Feign call to product-service throws a RuntimeException?</div>
+    <pre class="code-block" style="margin-bottom:1rem;">@Transactional
+public OrderResponse createOrder(OrderRequest req, String userId) {
+  ProductDto p = productClient.getProduct(req.productId());
+  Order order = mapper.toEntity(req);
+  orderRepo.save(order);
+  kafka.send("order.created", new OrderEvent(order.getId()));
+  return mapper.toResponse(order);
+}</pre>
+    <div class="q-options-list">
+      <div class="q-option"><span class="q-option-key">A</span> The order is saved but Kafka event is skipped</div>
+      <div class="q-option"><span class="q-option-key">B</span> The entire method rolls back due to @Transactional</div>
+      <div class="q-option"><span class="q-option-key">C</span> The order is saved and a Kafka event is published</div>
+      <div class="q-option"><span class="q-option-key">D</span> The transaction rolls back but the Kafka event is still sent</div>
+    </div>
+  </div>
+
+  <div class="q-container q-docker">
+    <div class="q-type"><span>DOCKER</span> <span>EASY</span></div>
+    <div class="q-title">3. What is the purpose of the COPY pom.xml . instruction appearing BEFORE COPY src ./src in a Spring Boot Dockerfile?</div>
+    <pre class="code-block" style="margin-bottom:1rem;">FROM eclipse-temurin:21-jdk-alpine AS builder
+WORKDIR /build
+COPY pom.xml .
+COPY mvnw .
+RUN ./mvnw dependency:go-offline -B
+COPY src ./src
+RUN ./mvnw package -DskipTests</pre>
+    <div class="q-options-list">
+      <div class="q-option"><span class="q-option-key">A</span> It is required by Maven before source code is available</div>
+      <div class="q-option"><span class="q-option-key">B</span> It enables Docker layer caching — deps download only when pom.xml changes</div>
+      <div class="q-option"><span class="q-option-key">C</span> It reduces the final image size by excluding source code</div>
+      <div class="q-option"><span class="q-option-key">D</span> It ensures the build user has permission to read the source</div>
+    </div>
+  </div>
+
+  <div class="q-container q-docker">
+    <div class="q-type"><span>DOCKER</span> <span>MEDIUM</span></div>
+    <div class="q-title">4. In docker-compose.yml, the order-service has 'depends_on: kafka: condition: service_healthy'. What does this guarantee?</div>
+    <div class="q-options-list">
+      <div class="q-option"><span class="q-option-key">A</span> order-service starts only after the kafka container ID exists</div>
+      <div class="q-option"><span class="q-option-key">B</span> order-service starts only after Kafka passes its healthcheck</div>
+      <div class="q-option"><span class="q-option-key">C</span> order-service and kafka start simultaneously in parallel</div>
+      <div class="q-option"><span class="q-option-key">D</span> Kafka will restart automatically if order-service crashes</div>
+    </div>
+  </div>
+
+  <div class="q-container q-docker">
+    <div class="q-type"><span>DOCKER</span> <span>HARD</span></div>
+    <div class="q-title">5. Why does the multi-stage Dockerfile copy the layered JAR in 4 separate COPY instructions instead of a single COPY?</div>
+    <pre class="code-block" style="margin-bottom:1rem;">COPY --from=builder /build/layers/dependencies .
+COPY --from=builder /build/layers/spring-boot-loader .
+COPY --from=builder /build/layers/snapshot-dependencies .
+COPY --from=builder /build/layers/application .</pre>
+    <div class="q-options-list">
+      <div class="q-option"><span class="q-option-key">A</span> The JarLauncher requires the layers to be in separate filesystem directories</div>
+      <div class="q-option"><span class="q-option-key">B</span> Each COPY creates a separate Docker layer, so only changed layers are pushed to the registry</div>
+      <div class="q-option"><span class="q-option-key">C</span> Spring Boot cannot read a single merged JAR at runtime</div>
+      <div class="q-option"><span class="q-option-key">D</span> It is required by the eclipse-temurin base image</div>
+    </div>
+  </div>
+
+  <div class="q-container q-k8s">
+    <div class="q-type"><span>KUBERNETES</span> <span>EASY</span></div>
+    <div class="q-title">6. A Pod's readinessProbe is failing but the livenessProbe passes. What does Kubernetes do?</div>
+    <div class="q-options-list">
+      <div class="q-option"><span class="q-option-key">A</span> Kills and restarts the Pod</div>
+      <div class="q-option"><span class="q-option-key">B</span> Removes the Pod from Service endpoints so no traffic reaches it</div>
+      <div class="q-option"><span class="q-option-key">C</span> Scales down the Deployment by one replica</div>
+      <div class="q-option"><span class="q-option-key">D</span> Does nothing — only livenessProbe triggers action</div>
+    </div>
+  </div>
+
+  <div class="q-container q-k8s">
+    <div class="q-type"><span>KUBERNETES</span> <span>MEDIUM</span></div>
+    <div class="q-title">7. In the Deployment manifest, what does maxUnavailable: 0 combined with maxSurge: 1 achieve?</div>
+    <pre class="code-block" style="margin-bottom:1rem;">strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0</pre>
+    <div class="q-options-list">
+      <div class="q-option"><span class="q-option-key">A</span> The update pauses and requires manual approval at each step</div>
+      <div class="q-option"><span class="q-option-key">B</span> All old pods are terminated first, then new pods start (recreate strategy)</div>
+      <div class="q-option"><span class="q-option-key">C</span> One extra pod is created first; old pods are removed only after new ones are healthy</div>
+      <div class="q-option"><span class="q-option-key">D</span> The deployment is limited to 1 replica during the update</div>
+    </div>
+  </div>
+
+  <div class="q-container q-k8s">
+    <div class="q-type"><span>KUBERNETES</span> <span>MEDIUM</span></div>
+    <div class="q-title">8. The order-service Pod uses both 'envFrom: configMapRef' and 'envFrom: secretRef'. If the same key DB_PASS exists in both, which value wins?</div>
+    <div class="q-options-list">
+      <div class="q-option"><span class="q-option-key">A</span> The ConfigMap value always wins</div>
+      <div class="q-option"><span class="q-option-key">B</span> The Secret value always wins</div>
+      <div class="q-option"><span class="q-option-key">C</span> The last envFrom entry in the list wins</div>
+      <div class="q-option"><span class="q-option-key">D</span> Kubernetes throws a validation error and rejects the Pod spec</div>
+    </div>
+  </div>
+
+  <div class="q-container q-k8s">
+    <div class="q-type"><span>KUBERNETES</span> <span>HARD</span></div>
+    <div class="q-title">9. The order-service has requests.memory: 256Mi and limits.memory: 512Mi. A traffic spike causes memory to hit 600Mi. What happens?</div>
+    <div class="q-options-list">
+      <div class="q-option"><span class="q-option-key">A</span> The Pod is immediately evicted and rescheduled on another Node</div>
+      <div class="q-option"><span class="q-option-key">B</span> The Pod is OOMKilled (killed by the Linux kernel) and restarted by the kubelet</div>
+      <div class="q-option"><span class="q-option-key">C</span> The HPA scales out new replicas to absorb the load</div>
+      <div class="q-option"><span class="q-option-key">D</span> K8s throttles the memory by compressing pages to stay under 512Mi</div>
+    </div>
+  </div>
+
+  <div class="q-container q-spring">
+    <div class="q-type"><span>SPRING BOOT</span> <span>MEDIUM</span></div>
+    <div class="q-title">10. Why does the application.yml use '${DB_HOST:localhost}' syntax instead of hardcoding the database hostname?</div>
+    <pre class="code-block" style="margin-bottom:1rem;">datasource:
+  url: jdbc:postgresql://${DB_HOST:localhost}:5432/ordersdb</pre>
+    <div class="q-options-list">
+      <div class="q-option"><span class="q-option-key">A</span> It is a Spring Security expression to protect the config value</div>
+      <div class="q-option"><span class="q-option-key">B</span> It reads the value from environment variable DB_HOST, falling back to 'localhost' if not set</div>
+      <div class="q-option"><span class="q-option-key">C</span> It is a Kubernetes placeholder replaced during kubectl apply</div>
+      <div class="q-option"><span class="q-option-key">D</span> It references a value in application-secrets.properties</div>
+    </div>
+  </div>
+
+  <div class="q-container q-docker">
+    <div class="q-type"><span>DOCKER</span> <span>MEDIUM</span></div>
+    <div class="q-title">11. What is the effect of setting 'imagePullPolicy: Always' in the Kubernetes Deployment manifest?</div>
+    <div class="q-options-list">
+      <div class="q-option"><span class="q-option-key">A</span> Kubernetes always downloads the image from the registry, even if it exists locally on the Node</div>
+      <div class="q-option"><span class="q-option-key">B</span> Kubernetes pulls the image only once and caches it forever on the Node</div>
+      <div class="q-option"><span class="q-option-key">C</span> The image is deleted from the Node after the Pod terminates</div>
+      <div class="q-option"><span class="q-option-key">D</span> It forces a rolling restart of all Pods every hour</div>
+    </div>
+  </div>
+
+  <div class="q-container q-k8s">
+    <div class="q-type"><span>KUBERNETES</span> <span>EASY</span></div>
+    <div class="q-title">12. You run 'kubectl apply -f k8s/' and one Deployment already exists with 3 replicas, but the file now specifies 5. What happens?</div>
+    <div class="q-options-list">
+      <div class="q-option"><span class="q-option-key">A</span> kubectl errors out — use kubectl replace to change existing resources</div>
+      <div class="q-option"><span class="q-option-key">B</span> kubectl ignores the change because the Deployment already exists</div>
+      <div class="q-option"><span class="q-option-key">C</span> kubectl patches the Deployment to 5 replicas (declarative reconciliation)</div>
+      <div class="q-option"><span class="q-option-key">D</span> The old Deployment is deleted and re-created from scratch</div>
+    </div>
+  </div>
+
+  <div class="q-container q-k8s">
+    <div class="q-type"><span>KUBERNETES</span> <span>HARD</span></div>
+    <div class="q-title">13. The HPA is configured with minReplicas: 2, maxReplicas: 10, and CPU target: 70%. Current state: 3 pods, avg CPU 210%. How many pods will K8s scale to?</div>
+    <div class="q-options-list">
+      <div class="q-option"><span class="q-option-key">A</span> 6 pods</div>
+      <div class="q-option"><span class="q-option-key">B</span> 7 pods</div>
+      <div class="q-option"><span class="q-option-key">C</span> 9 pods</div>
+      <div class="q-option"><span class="q-option-key">D</span> 10 pods (capped at maxReplicas)</div>
+    </div>
+  </div>
+
+  <div class="q-container q-spring">
+    <div class="q-type"><span>SPRING BOOT</span> <span>HARD</span></div>
+    <div class="q-title">14. The Notification Service consumes Kafka events. If the service restarts mid-processing, what prevents duplicate email sends?</div>
+    <div class="q-options-list">
+      <div class="q-option"><span class="q-option-key">A</span> Spring Kafka automatically deduplicates messages using the message ID</div>
+      <div class="q-option"><span class="q-option-key">B</span> Kafka deletes consumed messages immediately after delivery</div>
+      <div class="q-option"><span class="q-option-key">C</span> Consumer group offsets — Kafka tracks the last committed offset per group, resuming from where processing stopped</div>
+      <div class="q-option"><span class="q-option-key">D</span> The @KafkaListener annotation wraps each message in a database transaction</div>
+    </div>
+  </div>
+
+  <div class="q-container q-k8s">
+    <div class="q-type"><span>KUBERNETES</span> <span>HARD</span></div>
+    <div class="q-title">15. A new engineer runs 'kubectl delete namespace ecommerce'. What happens to the PostgreSQL data stored in PersistentVolumes?</div>
+    <div class="q-options-list">
+      <div class="q-option"><span class="q-option-key">A</span> All PVs are deleted along with the namespace — all data is lost</div>
+      <div class="q-option"><span class="q-option-key">B</span> PVs with reclaimPolicy: Retain survive namespace deletion; data is preserved</div>
+      <div class="q-option"><span class="q-option-key">C</span> PVs are automatically backed up to cloud storage before deletion</div>
+      <div class="q-option"><span class="q-option-key">D</span> Only the Pods are deleted; PVs are protected by Kubernetes RBAC</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── ANSWER KEY ── -->
+<div id="answer-key" class="content-section answer-key-section">
+  <div class="section-header">
+    <div class="section-badge badge-accent">FINAL CHAPTER · ANSWER KEY</div>
+    <h2 class="section-title">Answer <em>Key</em> & Explanations</h2>
+    <p class="section-lead">Check your answers against the expert solutions and dive deep into the reasoning behind each concept.</p>
+  </div>
+
+  <div class="ak-item q-spring">
+    <div class="ak-header"><span class="ak-qnum">Q1.</span> <span class="ak-ans">ANSWER: B</span></div>
+    <div class="ak-exp"><p><strong>@RestController</strong> is a convenience annotation that combines <code>@Controller</code> and <code>@ResponseBody</code>. Every method return value is automatically serialized to JSON and written directly to the response body.</p></div>
+    <div class="ak-concept"><strong>CONCEPT:</strong> @RestController for APIs, @Controller for Views.</div>
+  </div>
+
+  <div class="ak-item q-spring">
+    <div class="ak-header"><span class="ak-qnum">Q2.</span> <span class="ak-ans">ANSWER: B</span></div>
+    <div class="ak-exp"><p>Any checked exception triggers a full rollback of the database transaction due to <strong>@Transactional</strong>. However, Kafka writes are outside this boundary, necessitating pattern like the <strong>Transactional Outbox</strong> for true consistency.</p></div>
+    <div class="ak-concept"><strong>CONCEPT:</strong> Transaction boundaries do not include external message brokers by default.</div>
+  </div>
+
+  <div class="ak-item q-docker">
+    <div class="ak-header"><span class="ak-qnum">Q3.</span> <span class="ak-ans">ANSWER: B</span></div>
+    <div class="ak-exp"><p>By copying <code>pom.xml</code> first and downloading dependencies, Docker creates a cached layer. This layer is reused as long as dependencies don't change, significantly speeding up subsequent builds.</p></div>
+    <div class="ak-concept"><strong>CONCEPT:</strong> Docker Layer Caching — Order from least volatile to most volatile.</div>
+  </div>
+
+  <div class="ak-item q-docker">
+    <div class="ak-header"><span class="ak-qnum">Q4.</span> <span class="ak-ans">ANSWER: B</span></div>
+    <div class="ak-exp"><p>The <code>service_healthy</code> condition ensures the dependent service only starts after the healthcheck passes, not just when the container starts. This prevents connection-refused errors during boot.</p></div>
+    <div class="ak-concept"><strong>CONCEPT:</strong> depends_on with healthchecks for robust orchestration.</div>
+  </div>
+
+  <div class="ak-item q-docker">
+    <div class="ak-header"><span class="ak-qnum">Q5.</span> <span class="ak-ans">ANSWER: B</span></div>
+    <div class="ak-exp"><p>Each <code>COPY</code> creates a separate layer. Since dependencies change rarely and app code changes often, Docker only needs to push the small app layer on most updates, saving bandwidth and time.</p></div>
+    <div class="ak-concept"><strong>CONCEPT:</strong> Spring Boot Layered JARs for optimized CI/CD.</div>
+  </div>
+
+  <div class="ak-item q-k8s">
+    <div class="ak-header"><span class="ak-qnum">Q6.</span> <span class="ak-ans">ANSWER: B</span></div>
+    <div class="ak-exp"><p>Failures in the <strong>readinessProbe</strong> remove the Pod from Service endpoints (no traffic). The Pod remains running as long as the <strong>livenessProbe</strong> passes. Liveness failures trigger restarts.</p></div>
+    <div class="ak-concept"><strong>CONCEPT:</strong> Readiness (traffic) vs. Liveness (process health).</div>
+  </div>
+
+  <div class="ak-item q-k8s">
+    <div class="ak-header"><span class="ak-qnum">Q7.</span> <span class="ak-ans">ANSWER: C</span></div>
+    <div class="ak-exp"><p><strong>maxUnavailable: 0</strong> ensures capacity never drops. <strong>maxSurge: 1</strong> allows one extra pod. This results in a rolling update where new pods are verified healthy before old ones are removed.</p></div>
+    <div class="ak-concept"><strong>CONCEPT:</strong> Achieving Zero-Downtime deployments.</div>
+  </div>
+
+  <div class="ak-item q-k8s">
+    <div class="ak-header"><span class="ak-qnum">Q8.</span> <span class="ak-ans">ANSWER: C</span></div>
+    <div class="ak-exp"><p>When keys conflict across multiple <code>envFrom</code> sources, the last listed source wins. This allows for hierarchical configuration where sensitive Secrets override non-sensitive defaults.</p></div>
+    <div class="ak-concept"><strong>CONCEPT:</strong> Environment variable precedence in Kubernetes.</div>
+  </div>
+
+  <div class="ak-item q-k8s">
+    <div class="ak-header"><span class="ak-qnum">Q9.</span> <span class="ak-ans">ANSWER: B</span></div>
+    <div class="ak-exp"><p>Memory is a non-compressible resource. When a container exceeds its <strong>limit</strong>, it is immediately <strong>OOMKilled</strong> by the kernel. CPU, being compressible, is throttled instead.</p></div>
+    <div class="ak-concept"><strong>CONCEPT:</strong> Memory Limits vs. CPU Throttling.</div>
+  </div>
+
+  <div class="ak-item q-spring">
+    <div class="ak-header"><span class="ak-qnum">Q10.</span> <span class="ak-ans">ANSWER: B</span></div>
+    <div class="ak-exp"><p>The <code>${variable:default}</code> syntax allows the same image to run across local, compose, and K8s environments by resolving dynamic values at runtime from environment variables.</p></div>
+    <div class="ak-concept"><strong>CONCEPT:</strong> Externalized configuration (12-Factor App).</div>
+  </div>
+
+  <div class="ak-item q-docker">
+    <div class="ak-header"><span class="ak-qnum">Q11.</span> <span class="ak-ans">ANSWER: A</span></div>
+    <div class="ak-exp"><p><strong>imagePullPolicy: Always</strong> forces the kubelet to check the registry for every Pod start, ensuring the absolute latest version is run even if a local cache exists.</p></div>
+    <div class="ak-concept"><strong>CONCEPT:</strong> Controlling image pull behavior.</div>
+  </div>
+
+  <div class="ak-item q-k8s">
+    <div class="ak-header"><span class="ak-qnum">Q12.</span> <span class="ak-ans">ANSWER: C</span></div>
+    <div class="ak-exp"><p><code>kubectl apply</code> is <strong>declarative and idempotent</strong>. It patches the existing resource to match the desired state defined in the YAML file without recreation.</p></div>
+    <div class="ak-concept"><strong>CONCEPT:</strong> Declarative reconciliation.</div>
+  </div>
+
+  <div class="ak-item q-k8s">
+    <div class="ak-header"><span class="ak-qnum">Q13.</span> <span class="ak-ans">ANSWER: C</span></div>
+    <div class="ak-exp"><p>The HPA uses the formula: <code>ceil(currentReplicas * (currentMetric / targetMetric))</code>. Here: <code>ceil(3 * (210% / 70%)) = 9 pods</code>. No capping occurs as it's within the 2-10 range.</p></div>
+    <div class="ak-concept"><strong>CONCEPT:</strong> Understanding HPA scaling logic.</div>
+  </div>
+
+  <div class="ak-item q-spring">
+    <div class="ak-header"><span class="ak-qnum">Q14.</span> <span class="ak-ans">ANSWER: C</span></div>
+    <div class="ak-exp"><p>Kafka uses <strong>consumer group offsets</strong> to track progress. On restart, the consumer resumes from the last committed offset, ensuring at-least-once delivery semantics.</p></div>
+    <div class="ak-concept"><strong>CONCEPT:</strong> Kafka consumer offset management.</div>
+  </div>
+
+  <div class="ak-item q-k8s">
+    <div class="ak-header"><span class="ak-qnum">Q15.</span> <span class="ak-ans">ANSWER: B</span></div>
+    <div class="ak-exp"><p>The <strong>reclaimPolicy: Retain</strong> ensures that even if the PVC is deleted (which happens when a namespace is deleted), the underlying PersistentVolume and its data are preserved.</p></div>
+    <div class="ak-concept"><strong>CONCEPT:</strong> Data persistence and reclaim policies.</div>
+  </div>
+
+  <div class="ak-footer" style="margin-top: 4rem; text-align: center; border-top: 1px solid var(--border); padding-top: 2rem; color: var(--muted); font-size: 0.8rem;">
+    END OF HANDBOOK · © 2025 P. CHAUDHURI · ALL RIGHTS RESERVED
+  </div>
+</div>
+
+</div><!-- /#main -->
+</body>
+</html>
