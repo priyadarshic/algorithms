@@ -67,11 +67,17 @@ public class ReadWriteLockDemo {
             String user = "user" + i;
             String name = "John Doe" + i;
             executor.submit(() -> put(user, name));
-            executor.submit(() -> get(user));
+            executor.submit(() -> {
+                String result = get(user);
+                System.out.println("[Main Loop] Retrieved for " + user + ": " + result);
+            });
         }
 
         executor.submit(() -> put("user2", "Jane Smith"));
-        executor.submit(() -> get("user2"));
+        executor.submit(() -> {
+            String result = get("user2");
+            System.out.println("[Final Read] Retrieved for user2: " + result);
+        });
 
         // for (int i = 0; i < 5; i++) {
         // String user = "user" + i;

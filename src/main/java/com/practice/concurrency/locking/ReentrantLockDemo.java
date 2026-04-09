@@ -34,7 +34,7 @@ public class ReentrantLockDemo {
             System.out.println(Thread.currentThread().getName() + " incremented count to: " + count);
         } finally {
             // Always unlock in a finally block to ensure release even if an exception occurs
-            lock.unlock();
+            // lock.unlock();
         }
     }
 
@@ -42,7 +42,7 @@ public class ReentrantLockDemo {
         System.out.println("\n--- ReentrantLock Demo Starting ---");
         ExecutorService executor = Executors.newFixedThreadPool(3);
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 10; i++) {
             executor.submit(() -> increment());
         }
 
@@ -57,5 +57,10 @@ public class ReentrantLockDemo {
         }
         System.out.println("Final shared count: " + count);
         System.out.println("--- ReentrantLock Demo Finished ---\n");
+    }
+
+    public static void main(String[] args) {
+        ReentrantLockDemo demo = new ReentrantLockDemo();
+        demo.runDemo();
     }
 }

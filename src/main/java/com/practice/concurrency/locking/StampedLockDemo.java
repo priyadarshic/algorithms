@@ -73,7 +73,7 @@ public class StampedLockDemo {
         ExecutorService executor = Executors.newFixedThreadPool(4);
 
         // Multiple Readers (Optimistic)
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 9; i++) {
             executor.submit(() -> {
                 double dist = distanceFromOrigin();
                 System.out.println(Thread.currentThread().getName() + " distance: " + dist);
@@ -93,5 +93,9 @@ public class StampedLockDemo {
             Thread.currentThread().interrupt();
         }
         System.out.println("--- StampedLock Demo Finished ---\n");
+    }
+    public static void main(String[] args) {
+        StampedLockDemo demo = new StampedLockDemo();
+        demo.runDemo();
     }
 }
