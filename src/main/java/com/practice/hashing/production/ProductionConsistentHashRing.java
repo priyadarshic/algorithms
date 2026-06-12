@@ -25,7 +25,7 @@ public class ProductionConsistentHashRing {
     private final AtomicReference<VirtualNode[]> ringState = new AtomicReference<>(new VirtualNode[0]);
 
     // Internal source of truth used during mutations. Mutating this requires synchronization.
-    private final Map<String, Integer> physicalNodes = new HashMap<>(); // NodeId -> Weight
+    private final Map<String, Integer> physicalNodesMap = new HashMap<>(); // NodeId -> Weight
     
     public ProductionConsistentHashRing() {
         this(new MurmurHashFunction());
@@ -66,12 +66,12 @@ public class ProductionConsistentHashRing {
         Objects.requireNonNull(nodeId, "nodeId cannot be null");
         if (weight <= 0) throw new IllegalArgumentException("Weight must be > 0");
 
-        if (physicalNodes.containsKey(nodeId)) {
+        if (physicalNodesMap.containsKey(nodeId)) {
             // Already exists; maybe log or do an update if weight changed?
             // For simplicity, we ignore duplicate adds or overwrite. Let's overwrite.
         }
         
-        physicalNodes.put(nodeId, weight);
+        physicalNodesMap.put(nodeId, weight);
         rebuildRing();
         notifyNodeAdded(nodeId);
     }
@@ -82,7 +82,7 @@ public class ProductionConsistentHashRing {
      */
     public synchronized void removeNode(String nodeId) {
         Objects.requireNonNull(nodeId, "nodeId cannot be null");
-        if (physicalNodes.remove(nodeId) != null) {
+        if (physicalNodesMap.remove(nodeId) != null) {
             rebuildRing();
             notifyNodeRemoved(nodeId);
         }
@@ -96,7 +96,7 @@ public class ProductionConsistentHashRing {
         // TreeMap naturally sorts by hash value
         TreeMap<Integer, String> treeMap = new TreeMap<>();
 
-        for (Map.Entry<String, Integer> entry : physicalNodes.entrySet()) {
+        for (Map.Entry<String, Integer> entry : physicalNodesMap.entrySet()) {
             String nodeId = entry.getKey();
             int weight = entry.getValue();
 

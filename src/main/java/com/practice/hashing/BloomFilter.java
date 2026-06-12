@@ -8,34 +8,39 @@ public class BloomFilter {
         Arrays.fill(bloomArray, false);
     }
 
-    public static void setBloomArray(String data)
+    private static int bloomAlgo1(String data)
     {
         // Hash algo 1
         int hash = data.hashCode();
         hash = Math.abs(hash) % bloomArray.length;
-        bloomArray[hash] = true;
-
-
-        // Hash algo 2
-        hash = MurmurHash3.hash32(data, 0);
-        hash = Math.abs(hash) % bloomArray.length;
-        bloomArray[hash] = true;
+        return hash;
 
     }
+
+    private static int bloomAlgo2(String data)
+    {
+        // Hash algo 2
+        int hash = MurmurHash3.hash32(data, 0);
+        hash = Math.abs(hash) % bloomArray.length;
+        return hash;
+
+    }
+
+    public static void setBloomArray(String data)
+    {
+        bloomArray[bloomAlgo1(data)] = true;
+
+        bloomArray[bloomAlgo2(data)] = true;
+    }
+
 
     public static boolean checkExists(String data)
     {
-        int hash = data.hashCode();
-        hash = Math.abs(hash) % bloomArray.length;
-        boolean bloomOne = bloomArray[hash];
-
-        hash = Math.abs(MurmurHash3.hash32(data, 0)) % bloomArray.length;
-        boolean bloomTwo = bloomArray[hash];
-
-        return bloomOne && bloomTwo;
+        return bloomArray[ bloomAlgo1(data)] && bloomArray[ bloomAlgo2(data)];
     }
 
     public static void main(String[] args) {
+
         String[] entryArr = {"ID-One", "ID-Two", "ID-TWO"};
         String[] checkArr = {"ID-One", "ID-Two", "ID-TWO", "ID-Four", "ID-Five", "ID-Six", "ID-Seven"};
 
@@ -50,7 +55,8 @@ public class BloomFilter {
             {
                 System.out.println(value + " is available");
             }
-            else {
+            else
+            {
                 System.out.println(value + " is NOT available");
             }
         }

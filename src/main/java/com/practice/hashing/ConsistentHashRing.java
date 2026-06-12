@@ -7,7 +7,7 @@ import java.util.*;
  *
  * Each physical node is placed on the ring VIRTUAL_NODES times, using the
  * key "nodeId#replicaIndex". This spreads load evenly even with a small
- * number of physical nodes and minimises key remapping on node changes.
+ * number of physical nodes and minimizes key remapping on node changes.
  *
  * The ring is a TreeMap<Integer, String>:
  *   - key   = Murmur hash of the virtual-node label (maps to the 2^32 int space)
@@ -74,6 +74,7 @@ public class ConsistentHashRing {
     public Optional<String> getNode(String key) {
         if (ring.isEmpty()) return Optional.empty();
         int keyHash = MurmurHash3.hash32(key, seed);
+
         // ceilingEntry: smallest key >= keyHash, or null if beyond the last entry
         Map.Entry<Integer, String> entry = ring.ceilingEntry(keyHash);
         if (entry == null) {
